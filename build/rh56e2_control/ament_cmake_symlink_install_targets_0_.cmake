@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/heejun/ros2_ws/build/rh56e2_control/hand_command_node" "/home/heejun/ros2_ws/build/rh56e2_control/fsm_init_node" "TARGETS" "hand_command_node" "fsm_init_node" "DESTINATION" "lib/rh56e2_control")

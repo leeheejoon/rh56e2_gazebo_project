@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/src/arms_ros2_control/controller/basic_joint_controller/launch/demo.launch.py

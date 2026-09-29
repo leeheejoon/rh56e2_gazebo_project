@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/src/robot-descriptions-common/robot_common_launch/launch/navigation/navigation_isaac_gt.launch.py

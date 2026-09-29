@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/brainco_description/ament_cmake_core/brainco_descriptionConfig.cmake

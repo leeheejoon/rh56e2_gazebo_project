@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/src/modbus-ros2-control/include/modbus_ros2_control/hands/dexterous_hand_base.h

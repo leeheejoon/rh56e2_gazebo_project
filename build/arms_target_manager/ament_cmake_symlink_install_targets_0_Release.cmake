@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/heejun/ros2_ws/build/arms_target_manager/arms_target_manager_node" "TARGETS" "arms_target_manager_node" "DESTINATION" "lib/arms_target_manager")

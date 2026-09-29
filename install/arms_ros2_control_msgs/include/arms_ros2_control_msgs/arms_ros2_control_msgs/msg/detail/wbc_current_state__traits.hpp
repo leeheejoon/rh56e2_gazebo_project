@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/arms_ros2_control_msgs/rosidl_generator_cpp/arms_ros2_control_msgs/msg/detail/wbc_current_state__traits.hpp

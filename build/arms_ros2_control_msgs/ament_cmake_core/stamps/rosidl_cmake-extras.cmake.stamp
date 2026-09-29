@@ -1,4 +1,0 @@
-# generated from rosidl_cmake/cmake/rosidl_cmake-extras.cmake.in
-
-set(arms_ros2_control_msgs_IDL_FILES "msg/Inputs.idl;msg/CircleMessage.idl;srv/ExecuteCircle.idl;msg/JointWaypoint.idl;srv/JointTrajectory.idl;srv/ExecutePath.idl;msg/LinearMessage.idl;action/JointTrajectory.idl;action/ExecuteLinear.idl;srv/ExecuteLinear.idl;action/MovecUseIK.idl;action/WaistLiftingPose.idl;srv/KinematicsService.idl;srv/MovecUseIK.idl;msg/WbcCapability.idl;msg/WbcCurrentState.idl;msg/TeleopMode.idl")
-set(arms_ros2_control_msgs_INTERFACE_FILES "msg/Inputs.msg;msg/CircleMessage.msg;srv/ExecuteCircle.srv;msg/JointWaypoint.msg;srv/JointTrajectory.srv;srv/ExecutePath.srv;msg/LinearMessage.msg;action/JointTrajectory.action;action/ExecuteLinear.action;srv/ExecuteLinear.srv;action/MovecUseIK.action;action/WaistLiftingPose.action;srv/KinematicsService.srv;srv/MovecUseIK.srv;msg/WbcCapability.msg;msg/WbcCurrentState.msg;msg/TeleopMode.msg")

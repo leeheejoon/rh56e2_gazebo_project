@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/inspire_description/ament_cmake_core/inspire_descriptionConfig.cmake

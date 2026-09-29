@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/heejun/ros2_ws/build/arms_rviz_control_plugin/libarms_rviz_control_plugin.so" "TARGETS" "arms_rviz_control_plugin" "ARCHIVE_DESTINATION" "lib" "LIBRARY_DESTINATION" "lib" "RUNTIME_DESTINATION" "bin")

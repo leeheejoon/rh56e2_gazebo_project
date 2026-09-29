@@ -1,1 +1,0 @@
-Invoking command in '/home/heejun/ros2_ws/build/topic_based_ros2_control': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/heejun/ros2_ws/install/robot_common_launch:/opt/ros/jazzy /usr/bin/cmake /home/heejun/ros2_ws/src/arms_ros2_control/hardwares/topic_based_ros2_control -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/heejun/ros2_ws/install/topic_based_ros2_control

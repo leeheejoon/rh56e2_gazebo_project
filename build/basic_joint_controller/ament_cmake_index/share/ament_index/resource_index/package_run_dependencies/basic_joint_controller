@@ -1,1 +1,0 @@
-controller_interface;pluginlib;std_msgs;geometry_msgs;tf2_ros;tf2_geometry_msgs;robot_common_launch;arms_controller_common;controller_manager;joint_state_broadcaster;rviz2;ament_lint_auto;ament_lint_common;ament_cmake_pytest

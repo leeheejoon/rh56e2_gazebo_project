@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/src/robot-descriptions-common/robot_common_launch/launch/visualize/component.launch.py

@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/freedom_description/ament_cmake_core/freedom_descriptionConfig.cmake

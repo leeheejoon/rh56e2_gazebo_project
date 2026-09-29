@@ -1,3 +1,0 @@
-/home/heejun/ros2_ws/install/arms_controller_common/lib/libarms_controller_common.so
-/home/heejun/ros2_ws/install/arms_controller_common/share/arms_controller_common/cmake/export_arms_controller_commonExport.cmake
-/home/heejun/ros2_ws/install/arms_controller_common/share/arms_controller_common/cmake/export_arms_controller_commonExport-release.cmake

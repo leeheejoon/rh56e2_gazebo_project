@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/arms_ros2_control_msgs/rosidl_generator_cpp/arms_ros2_control_msgs/action/detail/execute_linear__type_support.hpp

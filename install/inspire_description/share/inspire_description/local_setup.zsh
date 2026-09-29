@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/inspire_description/ament_cmake_environment_hooks/local_setup.zsh

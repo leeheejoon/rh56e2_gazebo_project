@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/src/arms_ros2_control/command/arms_rviz_control_plugin/include/arms_rviz_control_plugin/gripper_control_panel.hpp

@@ -1,3 +1,0 @@
-source;share/arms_target_manager/environment/ament_prefix_path.sh
-source;share/arms_target_manager/environment/library_path.sh
-source;share/arms_target_manager/environment/path.sh

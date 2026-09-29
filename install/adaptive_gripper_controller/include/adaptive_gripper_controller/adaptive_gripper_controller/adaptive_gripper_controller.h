@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/src/arms_ros2_control/controller/adaptive_gripper_controller/include/adaptive_gripper_controller/adaptive_gripper_controller.h

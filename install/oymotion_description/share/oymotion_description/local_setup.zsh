@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/oymotion_description/ament_cmake_environment_hooks/local_setup.zsh

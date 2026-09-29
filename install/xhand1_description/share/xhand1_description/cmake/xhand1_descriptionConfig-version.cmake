@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/xhand1_description/ament_cmake_core/xhand1_descriptionConfig-version.cmake

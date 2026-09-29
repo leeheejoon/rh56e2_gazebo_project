@@ -1,3 +1,0 @@
-/home/heejun/ros2_ws/install/topic_based_ros2_control/lib/libtopic_based_ros2_control.so
-/home/heejun/ros2_ws/install/topic_based_ros2_control/share/topic_based_ros2_control/cmake/topic_based_ros2_controlTargetsExport.cmake
-/home/heejun/ros2_ws/install/topic_based_ros2_control/share/topic_based_ros2_control/cmake/topic_based_ros2_controlTargetsExport-noconfig.cmake

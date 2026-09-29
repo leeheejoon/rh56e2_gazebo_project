@@ -1,3 +1,0 @@
-/home/heejun/ros2_ws/install/basic_joint_controller/lib/basic_joint_controller/libbasic_joint_controller.so
-/home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/export_basic_joint_controllerExport.cmake
-/home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/export_basic_joint_controllerExport-release.cmake

@@ -1,1 +1,0 @@
-/home/heejun/ros2_ws/build/robot_common_launch/launch/manipulation/manipulator_ocs2.launch.py
