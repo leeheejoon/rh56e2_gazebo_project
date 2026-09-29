@@ -1,0 +1,36 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from arms_ros2_control_msgs/srv/JointTrajectory.srv
+// generated code does not contain a copyright notice
+
+#include "arms_ros2_control_msgs/msg/JointWaypoint.idl"
+
+module arms_ros2_control_msgs {
+  module srv {
+    @verbatim (language="comment", text=
+      "请求部分")
+    struct JointTrajectory_Request {
+      @verbatim (language="comment", text=
+        "关节名称列表")
+      sequence<string> joint_names;
+
+      @verbatim (language="comment", text=
+        "轨迹点列表")
+      sequence<arms_ros2_control_msgs::msg::JointWaypoint> waypoints;
+    };
+    @verbatim (language="comment", text=
+      "响应部分")
+    struct JointTrajectory_Response {
+      @verbatim (language="comment", text=
+        "是否成功")
+      boolean success;
+
+      @verbatim (language="comment", text=
+        "结果消息")
+      string message;
+
+      @verbatim (language="comment", text=
+        "实际规划的总运动时间")
+      double planned_duration;
+    };
+  };
+};

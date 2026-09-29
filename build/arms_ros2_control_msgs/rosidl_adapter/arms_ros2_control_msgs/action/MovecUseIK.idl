@@ -1,0 +1,35 @@
+// generated from rosidl_adapter/resource/action.idl.em
+// with input from arms_ros2_control_msgs/action/MovecUseIK.action
+// generated code does not contain a copyright notice
+
+#include "arms_ros2_control_msgs/msg/CircleMessage.idl"
+
+module arms_ros2_control_msgs {
+  module action {
+    @verbatim (language="comment", text=
+      "Goal")
+    struct MovecUseIK_Goal {
+      arms_ros2_control_msgs::msg::CircleMessage circle_params;
+    };
+    @verbatim (language="comment", text=
+      "Result")
+    struct MovecUseIK_Result {
+      boolean success;
+
+      string message;
+
+      double estimated_duration;
+
+      double actual_duration;
+    };
+    @verbatim (language="comment", text=
+      "Feedback")
+    struct MovecUseIK_Feedback {
+      double progress;
+
+      double elapsed_time;
+
+      double remaining_time;
+    };
+  };
+};

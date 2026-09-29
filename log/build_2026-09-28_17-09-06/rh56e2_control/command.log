@@ -1,0 +1,2 @@
+Invoking command in '/home/heejun/ros2_ws/build/rh56e2_control': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/heejun/ros2_ws/install/robot_common_launch:/opt/ros/jazzy /usr/bin/cmake --build /home/heejun/ros2_ws/build/rh56e2_control -- -j8 -l8
+Invoked command in '/home/heejun/ros2_ws/build/rh56e2_control' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/heejun/ros2_ws/install/robot_common_launch:/opt/ros/jazzy /usr/bin/cmake --build /home/heejun/ros2_ws/build/rh56e2_control -- -j8 -l8

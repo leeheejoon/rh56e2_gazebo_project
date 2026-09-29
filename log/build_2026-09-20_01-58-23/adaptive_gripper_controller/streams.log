@@ -1,0 +1,40 @@
+[0.035s] Invoking command in '/home/heejun/ros2_ws/build/adaptive_gripper_controller': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/heejun/ros2_ws/install/robot_common_launch:/opt/ros/jazzy /usr/bin/cmake /home/heejun/ros2_ws/src/arms_ros2_control/controller/adaptive_gripper_controller -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/heejun/ros2_ws/install/adaptive_gripper_controller
+[0.306s] -- The C compiler identification is GNU 13.3.0
+[0.645s] -- The CXX compiler identification is GNU 13.3.0
+[0.919s] -- Detecting C compiler ABI info
+[1.067s] -- Detecting C compiler ABI info - done
+[1.073s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.074s] -- Detecting C compile features
+[1.074s] -- Detecting C compile features - done
+[1.105s] -- Detecting CXX compiler ABI info
+[1.267s] -- Detecting CXX compiler ABI info - done
+[1.279s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.279s] -- Detecting CXX compile features
+[1.280s] -- Detecting CXX compile features - done
+[1.283s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[1.441s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[1.525s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[1.566s] -- Found controller_interface: 4.48.0 (/opt/ros/jazzy/share/controller_interface/cmake)
+[1.710s] -- Found rosidl_generator_c: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[1.723s] -- Found rosidl_generator_cpp: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[1.744s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.768s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.056s] -- Found TinyXML2 via Config file: /usr/lib/x86_64-linux-gnu/cmake/tinyxml2
+[2.105s] -- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+[2.110s] -- Found rmw_fastrtps_cpp: 8.4.4 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+[2.132s] -- Found TinyXML2 via Config file: /usr/lib/x86_64-linux-gnu/cmake/tinyxml2
+[2.182s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.13")  
+[2.184s] -- Found TinyXML2 via Config file: /usr/lib/x86_64-linux-gnu/cmake/tinyxml2
+[2.271s] -- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") 
+[2.274s] -- Found TinyXML2 via Config file: /usr/lib/x86_64-linux-gnu/cmake/tinyxml2
+[2.280s] -- Found TinyXML2 via Config file: /usr/lib/x86_64-linux-gnu/cmake/tinyxml2
+[2.341s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[2.532s] -- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake (found version "1.83.0")  
+[2.794s] -- Configuring done (2.7s)
+[2.834s] -- Generating done (0.0s)
+[2.838s] -- Build files have been written to: /home/heejun/ros2_ws/build/adaptive_gripper_controller
+[2.851s] Invoked command in '/home/heejun/ros2_ws/build/adaptive_gripper_controller' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/heejun/ros2_ws/install/robot_common_launch:/opt/ros/jazzy /usr/bin/cmake /home/heejun/ros2_ws/src/arms_ros2_control/controller/adaptive_gripper_controller -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/heejun/ros2_ws/install/adaptive_gripper_controller
+[2.857s] Invoking command in '/home/heejun/ros2_ws/build/adaptive_gripper_controller': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/heejun/ros2_ws/install/robot_common_launch:/opt/ros/jazzy /usr/bin/cmake --build /home/heejun/ros2_ws/build/adaptive_gripper_controller -- -j8 -l8
+[2.907s] [ 50%] [32mBuilding CXX object CMakeFiles/adaptive_gripper_controller.dir/src/adaptive_gripper_controller.cpp.o[0m
+[16.281s] [100%] [32m[1mLinking CXX shared library libadaptive_gripper_controller.so[0m
+[16.549s] [100%] Built target adaptive_gripper_controller

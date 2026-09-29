@@ -1,0 +1,17 @@
+[  6%] [34m[1mGenerating include/arms_rviz_control_plugin/moc_ocs2_fsm_panel.cpp[0m
+[ 18%] [34m[1mGenerating include/arms_rviz_control_plugin/moc_wbc_capability_panel.cpp[0m
+[ 18%] [34m[1mGenerating include/arms_rviz_control_plugin/moc_switch_button.cpp[0m
+[ 25%] [34m[1mGenerating include/arms_rviz_control_plugin/moc_joint_control_panel.cpp[0m
+[ 31%] [34m[1mGenerating include/arms_rviz_control_plugin/moc_gripper_control_panel.cpp[0m
+[ 37%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/include/arms_rviz_control_plugin/moc_joint_control_panel.cpp.o[0m
+[ 43%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/include/arms_rviz_control_plugin/moc_gripper_control_panel.cpp.o[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/include/arms_rviz_control_plugin/moc_wbc_capability_panel.cpp.o[0m
+[ 56%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/include/arms_rviz_control_plugin/moc_ocs2_fsm_panel.cpp.o[0m
+[ 62%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/src/gripper_control_panel.cpp.o[0m
+[ 68%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/include/arms_rviz_control_plugin/moc_switch_button.cpp.o[0m
+[ 75%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/src/ocs2_fsm_panel.cpp.o[0m
+[ 81%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/src/joint_control_panel.cpp.o[0m
+[ 87%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/src/wbc_capability_panel.cpp.o[0m
+[ 93%] [32mBuilding CXX object CMakeFiles/arms_rviz_control_plugin.dir/src/switch_button.cpp.o[0m
+[100%] [32m[1mLinking CXX shared library libarms_rviz_control_plugin.so[0m
+[100%] Built target arms_rviz_control_plugin

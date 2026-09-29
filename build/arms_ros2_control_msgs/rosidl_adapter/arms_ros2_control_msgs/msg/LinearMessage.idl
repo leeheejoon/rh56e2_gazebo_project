@@ -1,0 +1,61 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from arms_ros2_control_msgs/msg/LinearMessage.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Pose.idl"
+
+module arms_ros2_control_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "linear_trajectory.msg" "\n"
+      "直线轨迹消息定义")
+    struct LinearMessage {
+      @verbatim (language="comment", text=
+        "====== 直线终点 ======" "\n"
+        "直线终点")
+      geometry_msgs::msg::Pose endpoint;
+
+      @verbatim (language="comment", text=
+        "双臂模式下右臂直线终点")
+      geometry_msgs::msg::Pose right_endpoint;
+
+      @verbatim (language="comment", text=
+        "====== 运动参数 ======" "\n"
+        "线性运动约束（单位：m/s, m/s², m/s³）")
+      double max_linear_velocity;
+
+      double max_linear_acceleration;
+
+      double max_linear_jerk;
+
+      @verbatim (language="comment", text=
+        "角运动约束（单位：rad/s, rad/s², rad/s³）")
+      double max_angular_velocity;
+
+      double max_angular_acceleration;
+
+      double max_angular_jerk;
+
+      @verbatim (language="comment", text=
+        "时间模式定义运动时间")
+      double duration;
+
+      @verbatim (language="comment", text=
+        "====== 配置选项 ======" "\n"
+        "true 时间模式；false：参数约束")
+      boolean time_mode;
+
+      @verbatim (language="comment", text=
+        "坐标系id")
+      string frame_id;
+
+      @verbatim (language="comment", text=
+        "要发哪个手，\"left\"、\"right\"或者\"both\"")
+      string arm_name;
+
+      @verbatim (language="comment", text=
+        "'BFGS','DLS','AUTO'")
+      string ik_type;
+    };
+  };
+};

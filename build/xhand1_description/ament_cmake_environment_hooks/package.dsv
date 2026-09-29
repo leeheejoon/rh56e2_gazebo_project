@@ -1,0 +1,4 @@
+source;share/xhand1_description/local_setup.bash
+source;share/xhand1_description/local_setup.dsv
+source;share/xhand1_description/local_setup.sh
+source;share/xhand1_description/local_setup.zsh

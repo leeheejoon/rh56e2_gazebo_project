@@ -1,0 +1,61 @@
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- Override CMake install command with custom implementation using symlinks instead of copying resources
+-- Found rclcpp: 28.1.22 (/opt/ros/jazzy/share/rclcpp/cmake)
+-- Found rosidl_generator_c: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+-- Found rosidl_generator_cpp: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+-- Found rmw_fastrtps_cpp: 8.4.4 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.13")  
+-- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") 
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Found geometry_msgs: 5.3.8 (/opt/ros/jazzy/share/geometry_msgs/cmake)
+-- Found visualization_msgs: 5.3.8 (/opt/ros/jazzy/share/visualization_msgs/cmake)
+-- Found interactive_markers: 2.5.5 (/opt/ros/jazzy/share/interactive_markers/cmake)
+-- Found arms_ros2_control_msgs: 1.1.0 (/home/heejun/ros2_ws/install/arms_ros2_control_msgs/share/arms_ros2_control_msgs/cmake)
+-- Found arms_controller_common: 1.5.0 (/home/heejun/ros2_ws/install/arms_controller_common/share/arms_controller_common/cmake)
+-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake (found version "1.83.0")  
+-- eigenpy FOUND. eigenpy at /opt/ros/jazzy/lib/x86_64-linux-gnu/libeigenpy.so
+-- Checking for NumPy
+--   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+--   NUMPY_VERSION=1.26.4
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter Development.Module NumPy 
+-- PythonLibraryDirs: 
+-- PythonLibVersionString: 3.12.3
+-- Python site lib: lib/python3.12/site-packages
+-- Python include dirs: /usr/include/python3.12
+-- Checking for NumPy
+--   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+--   NUMPY_VERSION=1.26.4
+-- NumPy include dir: /usr/lib/python3/dist-packages/numpy/core/include
+-- Found Boost: /usr/include (found version "1.83.0") found components: python312 
+-- Default C++ standard: 201703
+-- Minimal C++ standard upgraded to 11
+-- C++ standard sufficient: Minimal required 11, currently defined: 17
+-- CMAKE_CXX_STANDARD was not set: automatically set to currently defined standard 17
+-- coal FOUND. coal at /opt/ros/jazzy/lib/x86_64-linux-gnu/libcoal.so
+-- Minimal C++ standard upgraded to 14
+-- C++ standard sufficient: Minimal required 14, currently defined: 17
+-- Minimal C++ standard upgraded to 17
+-- C++ standard sufficient: Minimal required 17, currently defined: 17
+-- Found eigen3_cmake_module: 0.3.1 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)
+-- Found Eigen3: TRUE (found version "3.4.0") 
+-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+-- Found controller_manager_msgs: 4.48.0 (/opt/ros/jazzy/share/controller_manager_msgs/cmake)
+-- Configuring done (3.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/heejun/ros2_ws/build/arms_target_manager

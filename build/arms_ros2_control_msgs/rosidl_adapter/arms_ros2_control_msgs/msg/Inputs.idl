@@ -1,0 +1,36 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from arms_ros2_control_msgs/msg/Inputs.msg
+// generated code does not contain a copyright notice
+
+
+module arms_ros2_control_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "control input message")
+    struct Inputs {
+      @verbatim (language="comment", text=
+        "position")
+      float x;
+
+      float y;
+
+      float z;
+
+      @verbatim (language="comment", text=
+        "rotation")
+      float roll;
+
+      float pitch;
+
+      float yaw;
+
+      @verbatim (language="comment", text=
+        "command target, left(1) or right arm(2)")
+      int32 target;
+
+      @verbatim (language="comment", text=
+        "hand/gripper: nan=no command; 0=close / 1=open (target_command); else 0~1 open ratio (target_percent)")
+      float hand_command;
+    };
+  };
+};

@@ -1,0 +1,1 @@
+/home/heejun/ros2_ws/src/robot-descriptions-common/robot_common_launch/launch/navigation/amr_rctk.launch.py

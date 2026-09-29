@@ -1,0 +1,15 @@
+# WbcCapability.msg
+# ocs2_wbc_controller约束功能启用信息
+
+bool has_mobile_base
+bool has_body_relative_constraint
+bool has_waist_lock
+bool has_head_coupling
+bool has_custom_joint_lock
+bool has_bimanual_coupling
+bool body_tracking_ee_enabled
+bool head_tracking_ee_enabled
+bool has_home_joint_reference
+
+# Configured ability to gaze at the midpoint of both end effectors.
+bool head_midpoint_gaze_enabled

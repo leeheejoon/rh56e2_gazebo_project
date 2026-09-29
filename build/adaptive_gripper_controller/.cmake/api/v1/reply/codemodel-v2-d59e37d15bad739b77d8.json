@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-06e4a75f3d576f1813b4.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "adaptive_gripper_controller",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "adaptive_gripper_controller::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-adaptive_gripper_controller-Release-716f5c1b539445994b35.json",
+					"name" : "adaptive_gripper_controller",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "adaptive_gripper_controller_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-adaptive_gripper_controller_uninstall-Release-567069847cefef0d5358.json",
+					"name" : "adaptive_gripper_controller_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-Release-7eb533718ed672486bed.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/heejun/ros2_ws/build/adaptive_gripper_controller",
+		"source" : "/home/heejun/ros2_ws/src/arms_ros2_control/controller/adaptive_gripper_controller"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

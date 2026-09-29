@@ -1,0 +1,24 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from arms_ros2_control_msgs/srv/ExecuteCircle.srv
+// generated code does not contain a copyright notice
+
+#include "arms_ros2_control_msgs/msg/CircleMessage.idl"
+
+module arms_ros2_control_msgs {
+  module srv {
+    @verbatim (language="comment", text=
+      "请求部分")
+    struct ExecuteCircle_Request {
+      arms_ros2_control_msgs::msg::CircleMessage circle_params;
+    };
+    @verbatim (language="comment", text=
+      "响应部分")
+    struct ExecuteCircle_Response {
+      boolean success;
+
+      string message;
+
+      double estimated_duration;
+    };
+  };
+};

@@ -1,0 +1,1 @@
+hardware_interface;pluginlib;rclcpp;rclcpp_lifecycle;geometry_msgs;gripper_hardware_common;arms_controller_common;ament_cmake_gmock;ament_cmake_pytest;ament_lint_auto;ament_lint_common;ros2_control_test_assets

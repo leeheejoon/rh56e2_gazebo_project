@@ -1,0 +1,102 @@
+[0.086s] Invoking command in '/home/heejun/ros2_ws/build/arms_rviz_control_plugin': CMAKE_PREFIX_PATH=/home/heejun/ros2_ws/install/arms_controller_common:/home/heejun/ros2_ws/install/arms_ros2_control_msgs:/home/heejun/ros2_ws/install/xhand1_description:/home/heejun/ros2_ws/install/wuji_description:/home/heejun/ros2_ws/install/topic_based_ros2_control:/home/heejun/ros2_ws/install/theohand_description:/home/heejun/ros2_ws/install/robotiq_description:/home/heejun/ros2_ws/install/oymotion_description:/home/heejun/ros2_ws/install/marvin_gripper_description:/home/heejun/ros2_ws/install/linkerhand_description:/home/heejun/ros2_ws/install/jodell_description:/home/heejun/ros2_ws/install/inspire_description:/home/heejun/ros2_ws/install/hitbot_description:/home/heejun/ros2_ws/install/freedom_description:/home/heejun/ros2_ws/install/eincinx_description:/home/heejun/ros2_ws/install/dh_description:/home/heejun/ros2_ws/install/changingtek_description:/home/heejun/ros2_ws/install/brainco_description:/home/heejun/ros2_ws/install/basic_joint_controller:/home/heejun/ros2_ws/install/sensor_models:/home/heejun/ros2_ws/install/ocs2_switched_model_interface:/home/heejun/ros2_ws/install/ocs2_ballbot:/home/heejun/ros2_ws/install/ocs2_sqp:/home/heejun/ros2_ws/install/ocs2_slp:/home/heejun/ros2_ws/install/ocs2_ros_interfaces:/home/heejun/ros2_ws/install/ocs2_double_integrator:/home/heejun/ros2_ws/install/ocs2_python_interface:/home/heejun/ros2_ws/install/ocs2_pinocchio_interface:/home/heejun/ros2_ws/install/ocs2_perceptive:/home/heejun/ros2_ws/install/ocs2_cartpole:/home/heejun/ros2_ws/install/ocs2_robotic_tools:/home/heejun/ros2_ws/install/ocs2_ocs2:/home/heejun/ros2_ws/install/ocs2_ipm:/home/heejun/ros2_ws/install/ocs2_ddp:/home/heejun/ros2_ws/install/hpipm_catkin:/home/heejun/ros2_ws/install/ocs2_qp_solver:/home/heejun/ros2_ws/install/ocs2_mpc:/home/heejun/ros2_ws/install/ocs2_oc:/home/heejun/ros2_ws/install/ocs2_frank_wolfe:/home/heejun/ros2_ws/install/ocs2_core:/home/heejun/ros2_ws/install/ocs2_thirdparty:/home/heejun/ros2_ws/install/ocs2_switched_model_msgs:/home/heejun/ros2_ws/install/ocs2_robotic_assets:/home/heejun/ros2_ws/install/ocs2_msgs:/home/heejun/ros2_ws/install/modbus_ros2_control:/home/heejun/ros2_ws/install/gripper_hardware_common:/home/heejun/ros2_ws/install/component_models:/home/heejun/ros2_ws/install/blasfeo_catkin:/home/heejun/ros2_ws/install/arms_teleop:/home/heejun/ros2_ws/install/arms_target_manager:/home/heejun/ros2_ws/install/arms_rviz_control_plugin:/home/heejun/ros2_ws/install/adaptive_gripper_controller:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/home/heejun/ros2_ws/install/robot_common_launch:/opt/ros/jazzy LD_LIBRARY_PATH=/home/heejun/ros2_ws/install/arms_controller_common/lib:/home/heejun/ros2_ws/install/arms_ros2_control_msgs/lib:/home/heejun/ros2_ws/install/topic_based_ros2_control/lib:/home/heejun/ros2_ws/install/basic_joint_controller/lib:/home/heejun/ros2_ws/install/ocs2_switched_model_interface/lib:/home/heejun/ros2_ws/install/ocs2_ballbot/lib:/home/heejun/ros2_ws/install/ocs2_sqp/lib:/home/heejun/ros2_ws/install/ocs2_slp/lib:/home/heejun/ros2_ws/install/ocs2_ros_interfaces/lib:/home/heejun/ros2_ws/install/ocs2_double_integrator/lib:/home/heejun/ros2_ws/install/ocs2_python_interface/lib:/home/heejun/ros2_ws/install/ocs2_pinocchio_interface/lib:/home/heejun/ros2_ws/install/ocs2_perceptive/lib:/home/heejun/ros2_ws/install/ocs2_cartpole/lib:/home/heejun/ros2_ws/install/ocs2_robotic_tools/lib:/home/heejun/ros2_ws/install/ocs2_ipm/lib:/home/heejun/ros2_ws/install/ocs2_ddp/lib:/home/heejun/ros2_ws/install/hpipm_catkin/lib:/home/heejun/ros2_ws/install/ocs2_qp_solver/lib:/home/heejun/ros2_ws/install/ocs2_mpc/lib:/home/heejun/ros2_ws/install/ocs2_oc/lib:/home/heejun/ros2_ws/install/ocs2_frank_wolfe/lib:/home/heejun/ros2_ws/install/ocs2_core/lib:/home/heejun/ros2_ws/install/ocs2_switched_model_msgs/lib:/home/heejun/ros2_ws/install/ocs2_msgs/lib:/home/heejun/ros2_ws/install/modbus_ros2_control/lib:/home/heejun/ros2_ws/install/blasfeo_catkin/lib:/home/heejun/ros2_ws/install/arms_target_manager/lib:/home/heejun/ros2_ws/install/arms_rviz_control_plugin/lib:/home/heejun/ros2_ws/install/adaptive_gripper_controller/lib:/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib PYTHONPATH=/home/heejun/ros2_ws/install/arms_ros2_control_msgs/lib/python3.12/site-packages:/home/heejun/ros2_ws/build/robot_common_launch:/home/heejun/ros2_ws/install/robot_common_launch/lib/python3.12/site-packages:/home/heejun/ros2_ws/install/ocs2_ballbot/lib/python3.12/site-packages:/home/heejun/ros2_ws/install/ocs2_double_integrator/lib/python3.12/site-packages:/home/heejun/ros2_ws/install/ocs2_switched_model_msgs/lib/python3.12/site-packages:/home/heejun/ros2_ws/install/ocs2_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/opt/gz_sim_vendor/lib/python:/opt/ros/jazzy/opt/sdformat_vendor/lib/python:/opt/ros/jazzy/opt/gz_transport_vendor/lib/python:/opt/ros/jazzy/opt/gz_msgs_vendor/lib/python:/opt/ros/jazzy/opt/gz_math_vendor/lib/python:/opt/ros/jazzy/lib/python3.12/site-packages /usr/bin/cmake /home/heejun/ros2_ws/src/arms_ros2_control/command/arms_rviz_control_plugin -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/heejun/ros2_ws/install/arms_rviz_control_plugin
+[0.170s] -- The C compiler identification is GNU 13.3.0
+[0.428s] -- The CXX compiler identification is GNU 13.3.0
+[0.695s] -- Detecting C compiler ABI info
+[0.866s] -- Detecting C compiler ABI info - done
+[0.872s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.874s] -- Detecting C compile features
+[0.874s] -- Detecting C compile features - done
+[0.917s] -- Detecting CXX compiler ABI info
+[1.078s] -- Detecting CXX compiler ABI info - done
+[1.084s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.084s] -- Detecting CXX compile features
+[1.085s] -- Detecting CXX compile features - done
+[1.089s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[1.240s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[1.317s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[1.358s] -- Found rclcpp: 28.1.22 (/opt/ros/jazzy/share/rclcpp/cmake)
+[1.506s] -- Found rosidl_generator_c: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[1.521s] -- Found rosidl_generator_cpp: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[1.540s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.565s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.643s] -- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+[1.648s] -- Found rmw_fastrtps_cpp: 8.4.4 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+[1.730s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.13")  
+[1.837s] -- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") 
+[1.885s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[1.990s] -- Found rviz_common: 14.1.23 (/opt/ros/jazzy/share/rviz_common/cmake)
+[2.103s] -- Setting OGRE_DIR to: '/opt/ros/jazzy/share/rviz_ogre_vendor/cmake/../../../opt/rviz_ogre_vendor/lib/OGRE/cmake'
+[2.105s] -- Found OGRE
+[2.105s] --   static     : OFF
+[2.105s] --   components : MeshLodGenerator;Overlay;Paging;Property;RTShaderSystem;Terrain;Volume
+[2.105s] --   plugins    : Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI
+[2.105s] --   media      : /opt/ros/jazzy/opt/rviz_ogre_vendor/share/OGRE/Media
+[2.105s] -- OGRE_LIBRARIES: OgreMeshLodGenerator;OgreOverlay;OgrePaging;OgreProperty;OgreRTShaderSystem;OgreTerrain;OgreVolume;OgreMain
+[2.105s] -- OGRE_LIBRARY_DIRS: /opt/ros/jazzy/opt/rviz_ogre_vendor/lib
+[2.106s] -- OGRE_PLUGINS: Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI
+[2.106s] -- OGRE_PLUGIN_DIR: /opt/ros/jazzy/opt/rviz_ogre_vendor/lib/OGRE
+[2.106s] -- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_RELEASE: /opt/ros/jazzy/opt/rviz_ogre_vendor/lib/libOgreOverlay.so
+[2.106s] -- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_DEBUG: /opt/ros/jazzy/opt/rviz_ogre_vendor/lib/libOgreOverlay.so
+[2.106s] -- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_RELEASE: /opt/ros/jazzy/opt/rviz_ogre_vendor/lib/libOgreMain.so
+[2.106s] -- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_DEBUG: /opt/ros/jazzy/opt/rviz_ogre_vendor/lib/libOgreMain.so
+[2.930s] -- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3")  
+[3.203s] -- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so   
+[5.090s] -- Found X11: /usr/include   
+[5.090s] -- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so
+[5.201s] -- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so - found
+[5.201s] -- Looking for gethostbyname
+[5.281s] -- Looking for gethostbyname - found
+[5.282s] -- Looking for connect
+[5.364s] -- Looking for connect - found
+[5.364s] -- Looking for remove
+[5.442s] -- Looking for remove - found
+[5.442s] -- Looking for shmat
+[5.521s] -- Looking for shmat - found
+[5.521s] -- Looking for IceConnectionNumber in ICE
+[5.607s] -- Looking for IceConnectionNumber in ICE - found
+[5.767s] -- Setting yaml-cpp_DIR to: '/opt/ros/jazzy/share/yaml_cpp_vendor/cmake/../../../opt/yaml_cpp_vendor/share/cmake/yaml-cpp'
+[5.776s] -- Found arms_controller_common: 1.5.0 (/home/heejun/ros2_ws/install/arms_controller_common/share/arms_controller_common/cmake)
+[5.860s] -- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake (found version "1.83.0")  
+[6.101s] -- eigenpy FOUND. eigenpy at /opt/ros/jazzy/lib/x86_64-linux-gnu/libeigenpy.so
+[6.118s] -- Checking for NumPy
+[6.306s] --   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+[6.377s] --   NUMPY_VERSION=1.26.4
+[6.652s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter Development.Module NumPy 
+[6.652s] -- PythonLibraryDirs: 
+[6.652s] -- PythonLibVersionString: 3.12.3
+[6.669s] -- Python site lib: lib/python3.12/site-packages
+[6.669s] -- Python include dirs: /usr/include/python3.12
+[6.701s] -- Checking for NumPy
+[6.777s] --   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+[6.859s] --   NUMPY_VERSION=1.26.4
+[6.859s] -- NumPy include dir: /usr/lib/python3/dist-packages/numpy/core/include
+[6.866s] -- Found Boost: /usr/include (found version "1.83.0") found components: python312 
+[7.148s] -- Default C++ standard: 201703
+[7.148s] -- Minimal C++ standard upgraded to 11
+[7.148s] -- C++ standard sufficient: Minimal required 11, currently defined: 17
+[7.148s] -- CMAKE_CXX_STANDARD was not set: automatically set to currently defined standard 17
+[7.153s] -- coal FOUND. coal at /opt/ros/jazzy/lib/x86_64-linux-gnu/libcoal.so
+[7.165s] -- Minimal C++ standard upgraded to 14
+[7.166s] -- C++ standard sufficient: Minimal required 14, currently defined: 17
+[7.167s] -- Minimal C++ standard upgraded to 17
+[7.167s] -- C++ standard sufficient: Minimal required 17, currently defined: 17
+[7.197s] -- Found eigen3_cmake_module: 0.3.1 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)
+[7.198s] -- Found Eigen3: TRUE (found version "3.4.0") 
+[7.198s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[7.269s] -- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)
+[7.363s] -- Added test 'copyright' to check source files copyright and LICENSE
+[7.366s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[7.366s] -- Configured cppcheck include dirs: /home/heejun/ros2_ws/src/arms_ros2_control/command/arms_rviz_control_plugin/include
+[7.366s] -- Configured cppcheck exclude dirs and/or files: 
+[7.368s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[7.368s] -- Configured cpplint exclude dirs and/or files: 
+[7.369s] -- Added test 'flake8' to check Python code syntax and style conventions
+[7.369s] -- Configured 'flake8' exclude dirs and/or files: 
+[7.370s] -- Added test 'lint_cmake' to check CMake code style
+[7.372s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[7.373s] -- Added test 'uncrustify' to check C / C++ code style
+[7.374s] -- Configured uncrustify additional arguments: 
+[7.375s] -- Added test 'xmllint' to check XML markup files
+[7.381s] -- Configuring done (7.3s)
+[7.425s] -- Generating done (0.0s)
+[7.429s] -- Build files have been written to: /home/heejun/ros2_ws/build/arms_rviz_control_plugin

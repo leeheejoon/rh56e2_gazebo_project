@@ -1,0 +1,107 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from arms_ros2_control_msgs/msg/CircleMessage.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Point.idl"
+#include "geometry_msgs/msg/Pose.idl"
+#include "geometry_msgs/msg/Vector3.idl"
+
+module arms_ros2_control_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "circle_trajectory.msg" "\n"
+      "圆形轨迹消息定义")
+    struct CircleMessage {
+      @verbatim (language="comment", text=
+        "====== 方法1：三点法定义圆弧 ======" "\n"
+        "需要提供3个点：起点、中间点、终点" "\n"
+        "其中起点通常由当前位置确定，这里只需提供中间点和终点" "\n"
+        "圆弧中间点")
+      geometry_msgs::msg::Pose midpoint;
+
+      @verbatim (language="comment", text=
+        "圆弧终点")
+      geometry_msgs::msg::Pose endpoint;
+
+      @verbatim (language="comment", text=
+        "双臂模式下右臂圆弧中间点")
+      geometry_msgs::msg::Pose right_midpoint;
+
+      @verbatim (language="comment", text=
+        "双臂模式下右臂圆弧终点")
+      geometry_msgs::msg::Pose right_endpoint;
+
+      @verbatim (language="comment", text=
+        "====== 方法2：参数法定义圆弧 ======" "\n"
+        "直接输入圆弧几何参数" "\n"
+        "圆心坐标")
+      geometry_msgs::msg::Point center;
+
+      @verbatim (language="comment", text=
+        "旋转轴（单位向量）")
+      geometry_msgs::msg::Vector3 axis;
+
+      @verbatim (language="comment", text=
+        "旋转角度（弧度）")
+      double rotate_angle;
+
+      @verbatim (language="comment", text=
+        "双臂模式下右臂圆心坐标")
+      geometry_msgs::msg::Point right_center;
+
+      @verbatim (language="comment", text=
+        "双臂模式下右臂旋转轴（单位向量）")
+      geometry_msgs::msg::Vector3 right_axis;
+
+      @verbatim (language="comment", text=
+        "双臂模式下右臂旋转角度（弧度）")
+      double right_rotate_angle;
+
+      @verbatim (language="comment", text=
+        "====== 运动参数 ======" "\n"
+        "线性运动约束（单位：m/s, m/s², m/s³）")
+      double max_linear_velocity;
+
+      double max_linear_acceleration;
+
+      double max_linear_jerk;
+
+      @verbatim (language="comment", text=
+        "角运动约束（单位：rad/s, rad/s², rad/s³）")
+      double max_angular_velocity;
+
+      double max_angular_acceleration;
+
+      double max_angular_jerk;
+
+      @verbatim (language="comment", text=
+        "时间模式定义运动时间")
+      double duration;
+
+      @verbatim (language="comment", text=
+        "====== 配置选项 ======" "\n"
+        "true:使用三点法; false:使用参数法")
+      boolean use_three_point_method;
+
+      @verbatim (language="comment", text=
+        "true:球面插值; false:线性插值")
+      boolean use_slerp_for_orientation;
+
+      @verbatim (language="comment", text=
+        "true 时间模式；false：参数约束")
+      boolean time_mode;
+
+      @verbatim (language="comment", text=
+        "坐标系id")
+      string frame_id;
+
+      @verbatim (language="comment", text=
+        "'left'左臂，'right'右臂，'both'双臂")
+      string arm_name;
+
+      @verbatim (language="comment", text=
+        "'BFGS','DLS','AUTO','SDK'")
+      string ik_type;
+    };
+  };
+};

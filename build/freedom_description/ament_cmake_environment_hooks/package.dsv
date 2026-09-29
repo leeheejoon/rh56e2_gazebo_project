@@ -1,0 +1,4 @@
+source;share/freedom_description/local_setup.bash
+source;share/freedom_description/local_setup.dsv
+source;share/freedom_description/local_setup.sh
+source;share/freedom_description/local_setup.zsh

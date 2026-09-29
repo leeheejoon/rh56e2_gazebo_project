@@ -1,0 +1,27 @@
+// generated from rosidl_typesupport_introspection_cpp/resource/idl__rosidl_typesupport_introspection_cpp.h.em
+// with input from arms_ros2_control_msgs:msg/TeleopMode.idl
+// generated code does not contain a copyright notice
+
+#ifndef ARMS_ROS2_CONTROL_MSGS__MSG__DETAIL__TELEOP_MODE__ROSIDL_TYPESUPPORT_INTROSPECTION_CPP_HPP_
+#define ARMS_ROS2_CONTROL_MSGS__MSG__DETAIL__TELEOP_MODE__ROSIDL_TYPESUPPORT_INTROSPECTION_CPP_HPP_
+
+
+#include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_typesupport_interface/macros.h"
+#include "rosidl_typesupport_introspection_cpp/visibility_control.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+// TODO(dirk-thomas) these visibility macros should be message package specific
+ROSIDL_TYPESUPPORT_INTROSPECTION_CPP_PUBLIC
+const rosidl_message_type_support_t *
+  ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspection_cpp, arms_ros2_control_msgs, msg, TeleopMode)();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // ARMS_ROS2_CONTROL_MSGS__MSG__DETAIL__TELEOP_MODE__ROSIDL_TYPESUPPORT_INTROSPECTION_CPP_HPP_

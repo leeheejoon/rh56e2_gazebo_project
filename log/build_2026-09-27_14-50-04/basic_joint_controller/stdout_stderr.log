@@ -1,0 +1,38 @@
+[ 25%] [32mBuilding CXX object CMakeFiles/basic_joint_controller.dir/src/BasicJointController.cpp.o[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/basic_joint_controller.dir/src/FSM/StateHold.cpp.o[0m
+[ 75%] [32m[1mLinking CXX shared library libbasic_joint_controller.so[0m
+[100%] Built target basic_joint_controller
+-- Install configuration: "Release"
+-- Execute custom install script
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller//basic_joint_controller.xml
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/include/basic_joint_controller/basic_joint_controller/BasicJointController.h
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/include/basic_joint_controller/basic_joint_controller/FSM/StateHold.h
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/include/basic_joint_controller/basic_joint_controller/FSM/StateMoveJ.h
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller//launch/demo.launch.py
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller//launch/hand.launch.py
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller//config/demo.rviz
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller//config/hand.rviz
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/environment/library_path.sh
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/environment/library_path.dsv
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/ament_index/resource_index/package_run_dependencies/basic_joint_controller
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/ament_index/resource_index/parent_prefix_path/basic_joint_controller
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/environment/path.sh
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/environment/path.dsv
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/local_setup.bash
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/local_setup.sh
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/local_setup.zsh
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/local_setup.dsv
+-- Symlinking: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/package.dsv
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/ament_index/resource_index/packages/basic_joint_controller
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/ament_index/resource_index/controller_interface__pluginlib__plugin/basic_joint_controller
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/ament_cmake_export_dependencies-extras.cmake
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/ament_cmake_export_targets-extras.cmake
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/basic_joint_controllerConfig.cmake
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/basic_joint_controllerConfig-version.cmake
+-- Up-to-date symlink: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/package.xml
+-- Installing: /home/heejun/ros2_ws/install/basic_joint_controller/lib/basic_joint_controller/libbasic_joint_controller.so
+-- Set non-toolchain portion of runtime path of "/home/heejun/ros2_ws/install/basic_joint_controller/lib/basic_joint_controller/libbasic_joint_controller.so" to ""
+-- Up-to-date: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/export_basic_joint_controllerExport.cmake
+-- Up-to-date: /home/heejun/ros2_ws/install/basic_joint_controller/share/basic_joint_controller/cmake/export_basic_joint_controllerExport-release.cmake

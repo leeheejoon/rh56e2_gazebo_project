@@ -1,0 +1,35 @@
+// generated from rosidl_adapter/resource/action.idl.em
+// with input from arms_ros2_control_msgs/action/ExecuteLinear.action
+// generated code does not contain a copyright notice
+
+#include "arms_ros2_control_msgs/msg/LinearMessage.idl"
+
+module arms_ros2_control_msgs {
+  module action {
+    @verbatim (language="comment", text=
+      "Goal")
+    struct ExecuteLinear_Goal {
+      arms_ros2_control_msgs::msg::LinearMessage linear_params;
+    };
+    @verbatim (language="comment", text=
+      "Result")
+    struct ExecuteLinear_Result {
+      boolean success;
+
+      string message;
+
+      double estimated_duration;
+
+      double actual_duration;
+    };
+    @verbatim (language="comment", text=
+      "Feedback")
+    struct ExecuteLinear_Feedback {
+      double progress;
+
+      double elapsed_time;
+
+      double remaining_time;
+    };
+  };
+};

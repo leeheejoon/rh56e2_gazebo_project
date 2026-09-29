@@ -1,0 +1,4 @@
+source;share/inspire_description/local_setup.bash
+source;share/inspire_description/local_setup.dsv
+source;share/inspire_description/local_setup.sh
+source;share/inspire_description/local_setup.zsh

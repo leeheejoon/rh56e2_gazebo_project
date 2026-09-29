@@ -1,0 +1,12 @@
+[ 12%] [32mBuilding CXX object CMakeFiles/topic_based_ros2_control.dir/src/topic_based_system.cpp.o[0m
+[ 25%] [32mBuilding CXX object gtest/CMakeFiles/gtest.dir/src/gtest-all.cc.o[0m
+[ 37%] [32mBuilding CXX object gtest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o[0m
+[ 50%] [32m[1mLinking CXX static library libgtest_main.a[0m
+[ 50%] Built target gtest_main
+[ 62%] [32m[1mLinking CXX static library libgtest.a[0m
+[ 62%] Built target gtest
+[ 75%] [32m[1mLinking CXX shared library libtopic_based_ros2_control.so[0m
+[ 75%] Built target topic_based_ros2_control
+[ 87%] [32mBuilding CXX object CMakeFiles/topic_based_system_test.dir/test/topic_based_system_test.cpp.o[0m
+[100%] [32m[1mLinking CXX executable topic_based_system_test[0m
+[100%] Built target topic_based_system_test

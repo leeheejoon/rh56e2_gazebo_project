@@ -1,0 +1,1 @@
+/home/heejun/ros2_ws/build/linkerhand_description/ament_cmake_environment_hooks/local_setup.sh

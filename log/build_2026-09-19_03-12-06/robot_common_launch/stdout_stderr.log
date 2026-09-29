@@ -1,0 +1,81 @@
+running develop
+running egg_info
+creating robot_common_launch.egg-info
+writing robot_common_launch.egg-info/PKG-INFO
+writing dependency_links to robot_common_launch.egg-info/dependency_links.txt
+writing requirements to robot_common_launch.egg-info/requires.txt
+writing top-level names to robot_common_launch.egg-info/top_level.txt
+writing manifest file 'robot_common_launch.egg-info/SOURCES.txt'
+reading manifest file 'robot_common_launch.egg-info/SOURCES.txt'
+writing manifest file 'robot_common_launch.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/heejun/ros2_ws/install/robot_common_launch/lib/python3.12/site-packages/robot-common-launch.egg-link (link to .)
+
+Installed /home/heejun/ros2_ws/build/robot_common_launch
+running symlink_data
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/ament_index
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/ament_index/resource_index
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/ament_index/resource_index/packages
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/resource/robot_common_launch -> /home/heejun/ros2_ws/install/robot_common_launch/share/ament_index/resource_index/packages
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/package.xml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/navigation/amr_rctk.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/navigation/cartographer.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/navigation/navigation_cartographer.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/navigation/navigation_slam.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/navigation/navigation_isaac_gt.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/navigation/navigation.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/visualize/humanoid.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/visualize/gripper.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/visualize/manipulator.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/visualize/hand.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/visualize/visualize.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/visualize/component.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/manipulation/manipulator_ocs2.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/manipulation/humanoid_ocs2.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/control/controller_manager.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/control/diff_drive.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/control/hardware_visualize.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/launch/control/cartesian_controller.launch.py -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/launch
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/cartesian_controller.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/hand.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/humanoid.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/manipulator.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/gripper.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/urdf.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/hardware_test.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/rviz/unitree_guide.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/rviz
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/nav2
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/nav2/ekf.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/nav2
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/nav2/nav2_params_isaac_gt.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/nav2
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/nav2/nav2_params.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/nav2
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/cartographer
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/cartographer/cartographer.rviz -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/cartographer
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/cartographer/cartographer.lua -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/cartographer
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/gazebo
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/gazebo/gz_bridge.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/gazebo
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/eef_control_registry.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/ros2_control
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/ros2_control/templates
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/ros2_control/templates/gripper.side.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/ros2_control/templates
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/xacro
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/xacro/ros2_control
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/xacro/ros2_control/simulation_hardware.xacro -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/xacro/ros2_control
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/xacro/ros2_control/side_system.xacro -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/xacro/ros2_control
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/worlds
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/worlds/empty.sdf -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/worlds
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/worlds/warehouse.sdf -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/worlds
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/worlds/bullet.sdf -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/worlds
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/worlds/dart.sdf -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/worlds
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/german_poc
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/maps/german_poc/scene.png -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/german_poc
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/maps/german_poc/map.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/german_poc
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/warehouse_with_forklifts
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/maps/warehouse_with_forklifts/map.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/warehouse_with_forklifts
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/maps/warehouse_with_forklifts/warehouse_with_forklifts.png -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/warehouse_with_forklifts
+creating /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/warehouse_multiple_shelfs
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/maps/warehouse_multiple_shelfs/map.png -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/warehouse_multiple_shelfs
+symbolically linking /home/heejun/ros2_ws/build/robot_common_launch/config/maps/warehouse_multiple_shelfs/map.yaml -> /home/heejun/ros2_ws/install/robot_common_launch/share/robot_common_launch/config/maps/warehouse_multiple_shelfs

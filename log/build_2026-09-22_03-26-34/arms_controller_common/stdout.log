@@ -1,0 +1,3 @@
+[  9%] [32mBuilding CXX object CMakeFiles/arms_controller_common.dir/src/FSM/StateMoveJ.cpp.o[0m
+[ 18%] [32m[1mLinking CXX shared library libarms_controller_common.so[0m
+[100%] Built target arms_controller_common

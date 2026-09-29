@@ -1,0 +1,11 @@
+ur5_hold_controller:
+  ros__parameters:
+    type: position_controllers/JointGroupPositionController
+
+    joints:
+      - ur5_shoulder_pan_joint
+      - ur5_shoulder_lift_joint
+      - ur5_elbow_joint
+      - ur5_wrist_1_joint
+      - ur5_wrist_2_joint
+      - ur5_wrist_3_joint
