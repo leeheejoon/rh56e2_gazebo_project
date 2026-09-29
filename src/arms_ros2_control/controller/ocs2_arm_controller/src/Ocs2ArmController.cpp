@@ -1,0 +1,642 @@
+//
+// Created for OCS2 Arm Controller
+//
+
+#include "ocs2_arm_controller/Ocs2ArmController.h"
+#include <algorithm>
+#include "ocs2_arm_controller/FSM/StateHome.h"
+#include "ocs2_arm_controller/FSM/StateOCS2.h"
+#include "ocs2_arm_controller/FSM/StateHold.h"
+#include "ocs2_arm_controller/FSM/StateMoveJ.h"
+#include <arms_controller_common/utils/GravityCompensation.h>
+#include "arms_controller_common/utils/Kinematics.h"
+#include <ocs2_controller_common/mpc/MpcExecutionParams.hpp>
+
+namespace ocs2::mobile_manipulator
+{
+    using config_type = controller_interface::interface_configuration_type;
+
+    controller_interface::InterfaceConfiguration Ocs2ArmController::command_interface_configuration() const
+    {
+        controller_interface::InterfaceConfiguration conf = {config_type::INDIVIDUAL, {}};
+
+        conf.names.reserve(joint_names_.size() * command_interface_types_.size());
+        for (const auto& joint_name : joint_names_)
+        {
+            for (const auto& interface_type : command_interface_types_)
+            {
+                if (!command_prefix_.empty())
+                {
+                    conf.names.push_back(command_prefix_ + "/" + joint_name + "/" + interface_type);
+                }
+                else
+                {
+                    conf.names.push_back(joint_name + "/" + interface_type);
+                }
+            }
+        }
+
+        return conf;
+    }
+
+    controller_interface::InterfaceConfiguration Ocs2ArmController::state_interface_configuration() const
+    {
+        controller_interface::InterfaceConfiguration conf = {config_type::INDIVIDUAL, {}};
+
+        conf.names.reserve(joint_names_.size() * state_interface_types_.size());
+        for (const auto& joint_name : joint_names_)
+        {
+            for (const auto& interface_type : state_interface_types_)
+            {
+                conf.names.push_back(joint_name + "/" + interface_type);
+            }
+        }
+
+        return conf;
+    }
+
+    controller_interface::return_type Ocs2ArmController::update(const rclcpp::Time& time,
+                                                                const rclcpp::Duration& period)
+    {
+        const std::string fsm = current_state_ ? current_state_->state_name_string : "none";
+        ctrl_comp_->beginRtCycle();
+        ctrl_comp_->applyRtLoopSchedulingOnce();
+        {
+            auto obs_scope = ctrl_comp_->rtScopeObs();
+            ctrl_comp_->updateObservation(time);
+        }
+
+        if (mode_ == FSMMode::NORMAL)
+        {
+            current_state_->run(time, period);
+            next_state_name_ = current_state_->checkChange();
+            if (next_state_name_ != current_state_->state_name)
+            {
+                mode_ = FSMMode::CHANGE;
+                next_state_ = getNextState(next_state_name_);
+                RCLCPP_INFO(get_node()->get_logger(), "Switched from %s to %s",
+                            current_state_->state_name_string.c_str(), next_state_->state_name_string.c_str());
+            }
+        }
+        else if (mode_ == FSMMode::CHANGE)
+        {
+            if (current_state_->needsAsyncExit())
+            {
+                if (!async_exit_started_)
+                {
+                    current_state_->beginExit();
+                    async_exit_started_ = true;
+                    ctrl_comp_->holdLastSentPositions();
+                }
+                else if (current_state_->tryFinishExit())
+                {
+                    current_state_ = next_state_;
+                    current_state_->enter();
+                    publishCurrentFsmState();
+                    syncPoseTargetAcceptance();
+                    if (current_state_->state_name == FSMStateName::OCS2)
+                    {
+                        ctrl_comp_->publishCachedCurrentTargets();
+                    }
+                    async_exit_started_ = false;
+                    mode_ = FSMMode::NORMAL;
+                    ctrl_interfaces_.fsm_command_ = 0;
+                }
+                else
+                {
+                    ctrl_comp_->holdLastSentPositions();
+                }
+            }
+            else
+            {
+                current_state_->exit();
+                current_state_ = next_state_;
+                current_state_->enter();
+                publishCurrentFsmState();
+                syncPoseTargetAcceptance();
+                if (current_state_->state_name == FSMStateName::OCS2)
+                {
+                    ctrl_comp_->publishCachedCurrentTargets();
+                }
+                mode_ = FSMMode::NORMAL;
+                ctrl_interfaces_.fsm_command_ = 0;
+            }
+        }
+
+        {
+            auto viz_scope = ctrl_comp_->rtScopeViz();
+            ctrl_comp_->maybeRequestVisualizationUpdate(time);
+        }
+        ctrl_comp_->endRtCycle(current_state_ ? current_state_->state_name_string : fsm);
+        return controller_interface::return_type::OK;
+    }
+
+    controller_interface::CallbackReturn Ocs2ArmController::on_init()
+    {
+        try
+        {
+            // Get controller name
+            controller_name_ = get_node()->get_name();
+
+            // Get update frequency
+            get_node()->get_parameter("update_rate", ctrl_interfaces_.frequency_);
+            RCLCPP_INFO(get_node()->get_logger(), "Controller Manager Update Rate: %d Hz", ctrl_interfaces_.frequency_);
+
+            // Hardware parameters
+            command_prefix_ = auto_declare<std::string>("command_prefix", command_prefix_);
+            joint_names_ = auto_declare<std::vector<std::string>>("joints", joint_names_);
+            command_interface_types_ =
+                auto_declare<std::vector<std::string>>("command_interfaces", command_interface_types_);
+            state_interface_types_ =
+                auto_declare<std::vector<std::string>>("state_interfaces", state_interface_types_);
+
+            // State machine parameters
+            home_pos_ = auto_declare<std::vector<double>>("home_pos", home_pos_);
+            rest_pos_ = auto_declare<std::vector<double>>("rest_pos", rest_pos_);
+
+            // Force control parameters
+            ctrl_interfaces_.default_gains_ = auto_declare<std::vector<double>>(
+                "default_gains", ctrl_interfaces_.default_gains_);
+
+            // PD control parameters (for OCS2 state)
+            ctrl_interfaces_.pd_gains_ = auto_declare<std::vector<double>>("pd_gains", ctrl_interfaces_.pd_gains_);
+
+            // MPC frequency parameter - default value 0 if not set
+            auto_declare<int>("mpc_frequency", 0);
+
+            auto auto_declare_func = [this](const std::string& name, const auto& default_value)
+            {
+                using T = std::decay_t<decltype(default_value)>;
+                return this->auto_declare<T>(name, default_value);
+            };
+            ctrl_comp_ = std::make_shared<CtrlComponent>(get_node(), ctrl_interfaces_, auto_declare_func);
+            std::shared_ptr<arms_controller_common::GravityCompensation> gravity_compensation = nullptr;
+            // // 新增：从参数读取末端执行器名称
+            // std::string left_ee_name_ = auto_declare<std::string>("left_ee_name", "left_tcp");
+            // std::string right_ee_name_ = auto_declare<std::string>("right_ee_name", "right_tcp");
+
+            // 从 CtrlComponent 的 OCS2 接口读取末端执行器名称
+            std::string left_ee_name_ = "left_tcp";  // 默认值
+            std::string right_ee_name_ = "right_tcp"; // 默认值
+
+            if (ctrl_comp_->interface_)
+            {
+                // 从 OCS2 模型信息中获取末端执行器名称
+                const auto& model_info = ctrl_comp_->interface_->getManipulatorModelInfo();
+                left_ee_name_ = model_info.eeFrame;    // 从 .info 文件读取（如 "left_eef"）
+                right_ee_name_ = model_info.eeFrame1;  // 从 .info 文件读取（如 "right_eef"）
+
+                RCLCPP_INFO(get_node()->get_logger(),
+                            "Using end effector names from OCS2 config: left='%s', right='%s'",
+                            left_ee_name_.c_str(), right_ee_name_.c_str());
+            }
+            else
+            {
+                RCLCPP_WARN(get_node()->get_logger(),
+                            "OCS2 interface not available, using default end effector names: left='%s', right='%s'",
+                            left_ee_name_.c_str(), right_ee_name_.c_str());
+            }
+            if (ctrl_comp_->interface_)
+            {
+                const auto& pinocchio_model = ctrl_comp_->interface_->getPinocchioInterface().getModel();
+                gravity_compensation = std::make_shared<arms_controller_common::GravityCompensation>(pinocchio_model);
+                kinematics_ = std::make_shared<arms_controller_common::ArmKinematics>(pinocchio_model);
+                kinematics_->initializeFromParameters(
+                    joint_names_, left_ee_name_, right_ee_name_,
+                    ctrl_comp_->interface_->dual_arm_);
+                const std::string robot_name = get_node()->get_parameter("robot_name").as_string();
+                RCLCPP_INFO(get_node()->get_logger(),
+                            "Gravity compensation initialized from OCS2 Pinocchio model");
+            }
+
+            // Home state
+            auto_declare<double>("home_duration", 3.0);
+            auto_declare<std::string>("home_interpolation_type", "linear");
+            auto_declare<double>("home_tanh_scale", 3.0);
+            auto_declare<int>("switch_command_base", 100);
+            state_list_.home = std::make_shared<StateHome>(
+                ctrl_interfaces_, gravity_compensation, get_node());
+
+            bool configs_loaded = state_list_.home->init(
+                [this](const std::string& name, const std::vector<double>& default_value)
+                {
+                    return this->auto_declare<std::vector<double>>(name, default_value);
+                });
+
+            // Fallback to legacy single home_pos configuration if no multi-home configs were loaded
+            if (!configs_loaded && !home_pos_.empty())
+            {
+                state_list_.home->setHomePosition(home_pos_);
+            }
+
+            // Configure rest pose if available
+            if (!rest_pos_.empty())
+            {
+                state_list_.home->setRestPose(rest_pos_);
+                RCLCPP_INFO(get_node()->get_logger(),
+                            "Rest pose configured with %zu joints", rest_pos_.size());
+            }
+            else
+            {
+                RCLCPP_INFO(get_node()->get_logger(), "No rest pose configured, using home pose only");
+            }
+
+            state_list_.ocs2 = std::make_shared<StateOCS2>(ctrl_interfaces_, get_node(), ctrl_comp_);
+
+            // Hold state
+            auto_declare<double>("hold_first_check_position_threshold", 0.1);
+            auto_declare<double>("hold_position_threshold", 0.1);
+            state_list_.hold = std::make_shared<StateHold>(
+                ctrl_interfaces_, get_node(), gravity_compensation);
+
+            // MoveJ state
+            auto_declare<double>("movej_duration", 3.0);
+            auto_declare<std::string>("movej_interpolation_type", "linear");
+            auto_declare<double>("movej_tanh_scale", 3.0);
+            auto_declare<double>("movej_trajectory_duration", 3.0);
+            auto_declare<double>("movej_trajectory_blend_ratio", 0.2);
+            auto_declare<double>("movej_max_velocity", 2.0);
+            auto_declare<double>("movej_max_acceleration", 4.0);
+            auto_declare<double>("movej_max_jerk", 20.0);
+            auto_declare<bool>("movej_auto_extend_duration", true);
+
+            state_list_.movej = std::make_shared<StateMoveJ>(
+                ctrl_interfaces_, get_node(), joint_names_, gravity_compensation);
+            state_list_.movej->setKinematicsSolver(kinematics_);
+
+            // ===== Waist lifting parameters copied from BasicJointController =====
+            waist_lifting_enabled_ = auto_declare<bool>("waist_lifting_enabled", false);
+
+            if (waist_lifting_enabled_)
+            {
+                auto_declare<double>("waist_lifting_duration", 3.0);
+                auto_declare<std::vector<double>>("waist_lifting_default_parameter", {0.25, 1.0, 5.0});
+                auto_declare<std::vector<double>>("waist_turning_default_parameter", {0.25, 1.0, 5.0});
+                auto_declare<double>("waist_turning_direction", 1.0);
+                std::string waist_lifting_type = auto_declare<std::string>("waist_lifting_type", "three_joint");
+                if (waist_lifting_type == "three_joint")
+                {
+                    auto_declare<double>("waist_l1", 0.322);
+                    auto_declare<double>("waist_l2", 0.355);
+                    auto_declare<std::vector<double>>("waist_rotation_direction", {1.0, 1.0, 1.0});
+                    auto_declare<std::vector<double>>("waist_angle_offset", {0.0, 0.0, 0.0});
+                }
+
+                RCLCPP_INFO(get_node()->get_logger(),
+                            "Waist lifting enabled for controller %s",
+                            controller_name_.c_str());
+            }
+
+            // Set joint limit checker from Pinocchio model
+            if (ctrl_comp_->interface_)
+            {
+                const auto& pinocchio_model = ctrl_comp_->interface_->getPinocchioInterface().getModel();
+                int arm_state_dim = ctrl_comp_->interface_->getManipulatorModelInfo().armDim;
+                Eigen::VectorXd lower_limits = pinocchio_model.lowerPositionLimit.tail(arm_state_dim);
+                Eigen::VectorXd upper_limits = pinocchio_model.upperPositionLimit.tail(arm_state_dim);
+                state_list_.movej->setJointLimitChecker(
+                    [lower_limits, upper_limits, arm_state_dim](
+                    const std::vector<double>& target_pos) -> std::vector<double>
+                    {
+                        std::vector<double> clamped_pos = target_pos;
+
+                        // Clamp each joint position to its limits
+                        for (size_t i = 0; i < clamped_pos.size() && i < static_cast<size_t>(arm_state_dim); ++i)
+                        {
+                            clamped_pos[i] = std::clamp(clamped_pos[i],
+                                                        static_cast<double>(lower_limits(i)),
+                                                        static_cast<double>(upper_limits(i)));
+                        }
+
+                        return clamped_pos;
+                    });
+
+                RCLCPP_INFO(get_node()->get_logger(),
+                            "Joint limit checker initialized from Pinocchio model (arm joints: %d)",
+                            arm_state_dim);
+
+                if (ctrl_comp_->interface_->isSelfCollisionEnabled())
+                {
+                    state_list_.movej->setCollisionCheckCallback(
+                        [ctrl_comp = ctrl_comp_](double /*threshold*/)
+                        {
+                            return ctrl_comp && ctrl_comp->isSelfCollisionActive();
+                        });
+                    state_list_.movej->setCollisionEnabled(true);
+                    state_list_.movej->setCollisionThreshold(
+                        ctrl_comp_->interface_->getSelfCollisionMinimumDistance());
+                }
+            }
+
+            return CallbackReturn::SUCCESS;
+        }
+        catch (const std::exception& e)
+        {
+            fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
+            return controller_interface::CallbackReturn::ERROR;
+        }
+    }
+
+    controller_interface::CallbackReturn Ocs2ArmController::on_configure(
+        const rclcpp_lifecycle::State& /*previous_state*/)
+    {
+        fsm_state_publisher_ = get_node()->create_publisher<std_msgs::msg::Int32>(
+            "/fsm_state", rclcpp::QoS(1).transient_local());
+
+        // Subscribe to FSM command (dedicated topic for state transitions)
+        fsm_command_subscription_ = get_node()->create_subscription<std_msgs::msg::Int32>(
+            "/fsm_command", 10, [this](const std_msgs::msg::Int32::SharedPtr msg)
+            {
+                ctrl_interfaces_.fsm_command_ = msg->data;
+            });
+
+        state_list_.movej->setupSubscriptions("target_joint_position", true);
+        state_list_.movej->setupTrajectorySubscription();
+        robot_description_subscription_ = get_node()->create_subscription<std_msgs::msg::String>(
+            "/robot_description", rclcpp::QoS(rclcpp::KeepLast(1)).transient_local(),
+            [this](const std_msgs::msg::String::SharedPtr msg)
+            {
+                state_list_.movej->updateJointLimitsFromURDF(msg->data);
+            });
+        state_list_.movej->setupJointTrajectoryAction("joint_trajectory_with_para");
+        state_list_.movej->setupLinearTrajectoryAction("execute_linear");
+        if (ctrl_comp_ && ctrl_comp_->pose_reference_manager_ && state_list_.movej)
+        {
+            auto* const reference_manager = ctrl_comp_->pose_reference_manager_.get();
+            auto* const movej = state_list_.movej.get();
+            movej->setCartesianTfBuffer(reference_manager->getTfBuffer());
+            reference_manager->setStampedTargetHandlers(
+                [movej](const geometry_msgs::msg::PoseStamped& msg)
+                {
+                    movej->handleCartesianStampedTarget("left", msg);
+                },
+                [movej](const geometry_msgs::msg::PoseStamped& msg)
+                {
+                    movej->handleCartesianStampedTarget("right", msg);
+                },
+                [movej](const nav_msgs::msg::Path& msg)
+                {
+                    movej->handleDualCartesianStampedTarget(msg);
+                });
+        }
+        state_list_.movej->setupCircleTrajectoryAction("execute_circle_use_ik");
+
+        kinematics_service_ = get_node()->create_service<arms_ros2_control_msgs::srv::KinematicsService>(
+            "kinematics_service",
+            std::bind(&Ocs2ArmController::handleKinematicsService, this,
+                      std::placeholders::_1, std::placeholders::_2));
+        // ===== Waist-related subscriptions copied from BasicJointController =====
+        if (waist_lifting_enabled_)
+        {
+            // 1) absolute lifting distance command
+            std::string waist_lifting_topic = "/" + controller_name_ + "/waist_lifting";
+            waist_lifting_subscription_ = get_node()->create_subscription<std_msgs::msg::Float64>(
+                waist_lifting_topic, 10,
+                [this](const std_msgs::msg::Float64::SharedPtr msg)
+                {
+                    // Only process in MOVEJ state
+                    if (!current_state_ || current_state_->state_name != FSMStateName::MOVEJ)
+                    {
+                        return;
+                    }
+
+                    if (state_list_.movej)
+                    {
+                        bool success = state_list_.movej->moveWaistLifting(
+                            Eigen::Vector3d(0.0, msg->data, 0.0));
+
+                        if (success)
+                        {
+                            RCLCPP_INFO(get_node()->get_logger(),
+                                        "Waist lifting command received: distance=%.3f",
+                                        msg->data);
+                        }
+                        else
+                        {
+                            RCLCPP_WARN(get_node()->get_logger(),
+                                        "waist lifting command failed");
+                        }
+                    }
+                });
+
+            // 2) speedj-like lifting factor command
+            std::string waist_lifting_command_topic = "/" + controller_name_ + "/waist_lifting_command";
+            waist_lifting_command_subscription_ = get_node()->create_subscription<std_msgs::msg::Float64>(
+                waist_lifting_command_topic, 10,
+                [this](const std_msgs::msg::Float64::SharedPtr msg)
+                {
+                    // Only process in MOVEJ state
+                    if (!current_state_ || current_state_->state_name != FSMStateName::MOVEJ)
+                    {
+                        return;
+                    }
+
+                    if (state_list_.movej)
+                    {
+                        bool success = state_list_.movej->setWaistLiftingFactor(msg->data);
+
+                        if (!success)
+                        {
+                            RCLCPP_WARN(get_node()->get_logger(),
+                                        "waist lifting command failed");
+                        }
+                    }
+                });
+
+            // 3) waist turning factor command
+            std::string waist_turning_command_topic = "/" + controller_name_ + "/waist_turning_command";
+            waist_turning_command_subscription_ = get_node()->create_subscription<std_msgs::msg::Float64>(
+                waist_turning_command_topic, 10,
+                [this](const std_msgs::msg::Float64::SharedPtr msg)
+                {
+                    if (!current_state_ || current_state_->state_name != FSMStateName::MOVEJ)
+                    {
+                        return;
+                    }
+
+                    if (state_list_.movej)
+                    {
+                        bool success = state_list_.movej->setWaistTurningFactor(msg->data);
+                        if (!success)
+                        {
+                            RCLCPP_WARN(get_node()->get_logger(),
+                                        "waist turning command failed");
+                        }
+                    }
+                });
+        }
+
+        return CallbackReturn::SUCCESS;
+    }
+
+    controller_interface::CallbackReturn Ocs2ArmController::on_activate(
+        const rclcpp_lifecycle::State& /*previous_state*/)
+    {
+        // clear out vectors in case of restart
+        ctrl_interfaces_.clear();
+
+        // assign command interfaces
+        for (auto& interface : command_interfaces_)
+        {
+            std::string interface_name = interface.get_interface_name();
+            if (const size_t pos = interface_name.find('/'); pos != std::string::npos)
+            {
+                command_interface_map_[interface_name.substr(pos + 1)]->push_back(interface);
+            }
+            else
+            {
+                command_interface_map_[interface_name]->push_back(interface);
+            }
+        }
+
+        // assign state interfaces
+        for (auto& interface : state_interfaces_)
+        {
+            state_interface_map_[interface.get_interface_name()]->push_back(interface);
+        }
+
+        // Auto-detect control mode based on available interfaces
+        ctrl_interfaces_.detectAndSetControlMode();
+
+        // Log detected control mode
+        if (ctrl_interfaces_.control_mode_ == ControlMode::MIX)
+        {
+            RCLCPP_INFO(get_node()->get_logger(),
+                        "Mixed control mode enabled - detected position, velocity, effort interfaces"
+                        " (kp/kd optional)");
+        }
+        else
+        {
+            RCLCPP_INFO(get_node()->get_logger(),
+                        "Position control mode enabled - standard position control interfaces detected");
+        }
+
+        ctrl_interfaces_.initializeLastSentPositions();
+        // Visualization thread: whole controller active lifetime (HOLD/MOVEJ/OCS2).
+        {
+            const auto mpc_params = ocs2::controller_common::computeMpcExecutionParams(
+                static_cast<double>(ctrl_interfaces_.frequency_),
+                get_node()->get_parameter("mpc_frequency").as_int(),
+                get_node()->get_logger());
+            ctrl_comp_->startVisualizationThread(mpc_params.thread_sleep_ms, mpc_params.mpc_period_sec);
+        }
+        // Initialize FSM
+        current_state_ = state_list_.hold;
+        current_state_->enter();
+        next_state_ = current_state_;
+        next_state_name_ = current_state_->state_name;
+        mode_ = FSMMode::NORMAL;
+        publishCurrentFsmState();
+        syncPoseTargetAcceptance();
+
+        return CallbackReturn::SUCCESS;
+    }
+
+    controller_interface::CallbackReturn Ocs2ArmController::on_deactivate(
+        const rclcpp_lifecycle::State& /*previous_state*/)
+    {
+        if (ctrl_comp_)
+        {
+            ctrl_comp_->stopVisualizationThread();
+        }
+        release_interfaces();
+        return CallbackReturn::SUCCESS;
+    }
+
+    controller_interface::CallbackReturn Ocs2ArmController::on_cleanup(
+        const rclcpp_lifecycle::State& /*previous_state*/)
+    {
+        return CallbackReturn::SUCCESS;
+    }
+
+    controller_interface::CallbackReturn Ocs2ArmController::on_error(
+        const rclcpp_lifecycle::State& /*previous_state*/)
+    {
+        return CallbackReturn::SUCCESS;
+    }
+
+    controller_interface::CallbackReturn Ocs2ArmController::on_shutdown(
+        const rclcpp_lifecycle::State& /*previous_state*/)
+    {
+        return CallbackReturn::SUCCESS;
+    }
+
+    std::shared_ptr<FSMState> Ocs2ArmController::getNextState(FSMStateName stateName) const
+    {
+        switch (stateName)
+        {
+        case FSMStateName::INVALID:
+            return state_list_.invalid;
+        case FSMStateName::HOME:
+            return state_list_.home;
+        case FSMStateName::OCS2:
+            return state_list_.ocs2;
+        case FSMStateName::HOLD:
+            return state_list_.hold;
+        case FSMStateName::MOVEJ:
+            return state_list_.movej;
+        default:
+            return state_list_.invalid;
+        }
+    }
+
+    void Ocs2ArmController::syncPoseTargetAcceptance() const
+    {
+        if (ctrl_comp_ && ctrl_comp_->pose_reference_manager_ && current_state_)
+        {
+            ctrl_comp_->pose_reference_manager_->setAcceptingTargets(
+                current_state_->state_name == FSMStateName::OCS2);
+        }
+    }
+
+    void Ocs2ArmController::handleKinematicsService(
+        const std::shared_ptr<arms_ros2_control_msgs::srv::KinematicsService::Request> request,
+        const std::shared_ptr<arms_ros2_control_msgs::srv::KinematicsService::Response> response)
+    {
+        if (kinematics_)
+        {
+            kinematics_->handleKinematicsService(request, response);
+        }
+        else
+        {
+            response->success = false;
+            response->message = "Kinematics not initialized";
+        }
+    }
+
+    void Ocs2ArmController::publishCurrentFsmState() const
+    {
+        if (!fsm_state_publisher_ || !current_state_)
+        {
+            return;
+        }
+
+        int32_t state_code = 0;
+        switch (current_state_->state_name)
+        {
+        case FSMStateName::HOME:
+            state_code = 1;
+            break;
+        case FSMStateName::HOLD:
+            state_code = 2;
+            break;
+        case FSMStateName::OCS2:
+            state_code = 3;
+            break;
+        case FSMStateName::MOVEJ:
+            state_code = 4;
+            break;
+        case FSMStateName::INVALID:
+        default:
+            state_code = 0;
+            break;
+        }
+
+        std_msgs::msg::Int32 msg;
+        msg.data = state_code;
+        fsm_state_publisher_->publish(msg);
+    }
+} // namespace mobile_manipulator
+
+#include "pluginlib/class_list_macros.hpp"
+PLUGINLIB_EXPORT_CLASS(ocs2::mobile_manipulator::Ocs2ArmController, controller_interface::ControllerInterface);

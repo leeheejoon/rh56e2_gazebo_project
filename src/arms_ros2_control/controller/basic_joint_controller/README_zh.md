@@ -1,0 +1,333 @@
+# Basic Joint Controller
+
+一个关节位置控制器，包含三状态 FSM（Home / Hold / MoveJ），支持可选的灵巧手开关/比例控制以及腰部升降/转向控制。
+
+## 1. 编译
+
+```bash
+cd ~/ros2_ws
+colcon build --packages-up-to basic_joint_controller --symlink-install
+```
+
+---
+
+## 2. 功能特性
+
+- **StateHome**：平滑插值到最多 10 个预设关节构型之一
+- **StateHold**：保持所有关节当前位置
+- **StateMoveJ**：接收目标关节位置并平滑插值；支持关节轨迹和基于前缀的局部控制
+- **灵巧手控制**（`target_command_enabled`）：开关控制或在两个预设构型间按比例插值
+- **腰部升降/转向控制**（`waist_lifting_enabled`）：基于速度系数的腰部运动
+
+---
+
+## 3. 配置参数
+
+```yaml
+my_controller:
+  ros__parameters:
+    update_rate: 1000           # 控制器更新频率 (Hz)
+    joints: ["j1", "j2", ...]   # 受控关节名称列表
+    command_interfaces: ["position"]
+    state_interfaces:  ["position", "velocity"]
+
+    # --- Home 构型（最多 10 个）---
+    home_1: [0.0, 0.0, ...]     # 必须
+    home_2: [0.5, 0.5, ...]     # 可选
+    home_3: [-0.5, -0.5, ...]   # 可选
+    home_duration: 3.0
+    home_interpolation_type: "tanh"   # "tanh" | "linear"
+    home_tanh_scale: 3.0
+    switch_command_base: 100    # 切换构型的 FSM 命令基础值
+
+    # --- MoveJ ---
+    movej_duration: 3.0
+    movej_interpolation_type: "tanh"  # "tanh" | "linear" | "doubles" | "none"
+    movej_tanh_scale: 3.0
+    movej_trajectory_duration: 3.0
+    movej_trajectory_blend_ratio: 0.0
+    # target_joint_position（tanh / linear / doubles）：duration 是下限。
+    # 若按该时长会超过速度约束，则自动拉长。none 不受影响。
+    # 设 movej_auto_extend_duration: false 可退回固定时长。
+    # joint_trajectory_with_para 路点未填 vel/acc/jerk 时，也用这组默认值。
+    movej_max_velocity: 2.0
+    movej_max_acceleration: 4.0    # 仅 doubles
+    movej_max_jerk: 20.0           # 仅 doubles
+    movej_auto_extend_duration: true
+
+    # --- 灵巧手 / 末端执行器开关与比例控制 ---
+    # 需要 target_command_enabled: true
+    # 使用 StateHome 的构型作为开/关目标位置
+    target_command_enabled: false
+    target_command_close_config: 1  # "关闭"构型的索引（0-based）
+    target_command_open_config: 0   # "打开"构型的索引（0-based）
+
+    # --- 腰部升降 ---
+    waist_lifting_enabled: false
+    waist_lifting_type: "three_joint"   # "three_joint" | "single_joint"
+    waist_lifting_duration: 3.0
+    waist_lifting_default_parameter: [0.25, 1.0, 5.0]  # [最大速度, 加速度, 减速度]
+    waist_turning_default_parameter: [0.25, 1.0, 5.0]  # [最大速度, 加速度, 减速度]
+    # 绝对位姿 TF 坐标系（仅 waist_lifting_pose_absolute 使用）
+    # 默认对齐 FiveAges W2；机型无对应 link 时需覆盖
+    waist_absolute_source_frame: "base_footprint"  # 绝对 (x, z) 所在坐标系
+    waist_absolute_target_frame: "body_base"       # phi / 相对规划坐标系
+    # (three_joint 模式专用)
+    waist_l1: 0.322
+    waist_l2: 0.355
+    waist_rotation_direction: [1.0, 1.0, 1.0]
+    waist_angle_offset: [0.0, 0.0, 0.0]
+    # (single_joint 模式专用 — 如 ARX Lift / Lift2S 棱柱升降)
+    waist_single_joint_direction: 1.0
+    waist_single_joint_offset: 0.0
+    waist_single_joint_pitch_joint: "_no_pitch_"   # 不在 joints 中则禁用俯仰
+    waist_single_joint_pitch_direction: 1.0
+    waist_single_joint_pitch_offset: 0.0
+```
+
+非 W2 机型示例：
+
+```yaml
+# ARX Lift / Lift2S
+body_joint_controller:
+  ros__parameters:
+    waist_lifting_enabled: true
+    waist_lifting_type: single_joint
+    waist_absolute_source_frame: base_link
+    waist_absolute_target_frame: lift_link
+```
+
+---
+
+## 4. FSM 状态转换
+
+通过向 `/fsm_command`（`std_msgs/Int32`）发布消息触发状态转换：
+
+| 值 | 动作 |
+|---|---|
+| `1` | 切换到 **HOME**（仅从 HOLD） |
+| `2` | 切换到 **HOLD**（从 HOME / MOVEJ） |
+| `4` | 切换到 **MOVEJ**（仅从 HOLD；与全身栈统一的规范命令） |
+| `3` | 切换到 **MOVEJ**（独立使用时的旧映射；在混合 OCS2/WBC 栈上 `3` 表示 OCS2） |
+| `switch_command_base`（默认 `100`） | (HOME) 循环切换到下一个构型 |
+| `switch_command_base + 1`（默认 `101`） | (HOME) 切换到构型 0 |
+| `switch_command_base + 2`（默认 `102`） | (HOME) 切换到构型 1 |
+| … | … |
+
+MOVEJ 只能回到 HOLD（`2`），不允许直接 MOVEJ → HOME。
+
+```bash
+ros2 topic pub --once /fsm_command std_msgs/msg/Int32 "data: 1"   # → HOME
+ros2 topic pub --once /fsm_command std_msgs/msg/Int32 "data: 4"   # → MOVEJ
+```
+
+---
+
+## 5. 话题接口
+
+以下所有话题均以控制器名称为命名空间（例如 `/left_hand_controller/...`）。
+
+### 5.1 MoveJ：目标关节位置
+
+**话题：** `/{controller_name}/target_joint_position`  
+**消息类型：** `std_msgs/Float64MultiArray`  
+**生效状态：** MOVEJ
+
+`tanh` / `linear` / `doubles` 下，`movej_duration` 是**下限**。峰值关节速度受 `movej_max_velocity`（默认 2.0 rad/s）约束；不够就自动拉长。`none` 立刻跳到目标，不受此约束。
+
+```bash
+ros2 topic pub --once /my_controller/target_joint_position \
+  std_msgs/msg/Float64MultiArray "{data: [0.1, 0.2, 0.3]}"
+```
+
+### 5.2 MoveJ：关节轨迹
+
+**话题：** `/{controller_name}/target_joint_trajectory`  
+**消息类型：** `trajectory_msgs/JointTrajectory`  
+**生效状态：** MOVEJ
+
+多路点轨迹，按 `movej_trajectory_blend_ratio` 进行路点融合。
+
+### 5.3 灵巧手 — 开关控制
+
+**话题：** `/{controller_name}/target_command`  
+**消息类型：** `std_msgs/Int32`  
+**前提：** `target_command_enabled: true`，当前状态 MOVEJ
+
+| 值 | 动作 |
+|---|---|
+| `0` | 移动到**关闭**构型（`home_configs[target_command_close_config]`） |
+| `1` | 移动到**打开**构型（`home_configs[target_command_open_config]`）  |
+
+```bash
+ros2 topic pub --once /left_hand_controller/target_command std_msgs/msg/Int32 "data: 0"  # 关闭
+ros2 topic pub --once /left_hand_controller/target_command std_msgs/msg/Int32 "data: 1"  # 打开
+```
+
+### 5.4 灵巧手 — 比例控制
+
+**话题：** `/{controller_name}/target_percent`  
+**消息类型：** `std_msgs/Float64`（范围：`0.0` ~ `1.0`）  
+**前提：** `target_command_enabled: true`，当前状态 MOVEJ
+
+在关闭构型和打开构型之间**逐关节线性插值**：
+
+```
+target[i] = close_config[i] + percent × (open_config[i] − close_config[i])
+```
+
+| 值 | 结果 |
+|---|---|
+| `0.0` | 完全关闭（等同于 `target_command = 0`） |
+| `1.0` | 完全打开（等同于 `target_command = 1`） |
+| `0.0~1.0` | 两个构型之间的比例混合 |
+
+超出 `[0.0, 1.0]` 的值会被截断并输出警告日志。
+
+```bash
+ros2 topic pub --once /left_hand_controller/target_percent \
+  std_msgs/msg/Float64 "data: 0.6"   # 打开至 60%
+```
+
+### 5.5 腰部升降 — 位置控制
+
+**话题：** `/{controller_name}/waist_lifting`  
+**消息类型：** `std_msgs/Float64`  
+**前提：** `waist_lifting_enabled: true`，当前状态 MOVEJ
+
+相对当前位置移动指定距离（米）。
+
+```bash
+ros2 topic pub --once /body_controller/waist_lifting std_msgs/msg/Float64 "data: 0.05"
+```
+
+### 5.6 腰部升降 — 局部 x/z/phi 相对移动
+
+**话题：** `/{controller_name}/waist_lifting_pose_relative`  
+**消息类型：** `std_msgs/Float64MultiArray`  
+**前提：** `waist_lifting_enabled: true`，当前状态 MOVEJ
+
+语义：`data: [dx, dz, dphi]`，单位与腰部机构 FK 的局部坐标一致（`dphi` 为 rad）。  
+该命令只在腰部机构局部坐标系中生效，不做 world/ground 坐标变换。
+
+```bash
+ros2 topic pub --once /body_controller/waist_lifting_pose_relative \
+  std_msgs/msg/Float64MultiArray "{data: [0.02, 0.05, 0.10]}"
+```
+
+### 5.7 腰部升降 — x/z/phi 绝对目标
+
+**话题：** `/{controller_name}/waist_lifting_pose_absolute`  
+**消息类型：** `std_msgs/Float64MultiArray`  
+**前提：** `waist_lifting_enabled: true`，当前状态 MOVEJ
+
+语义：`data: [x, z, phi]`。
+
+| 字段 | 坐标系（默认） | 说明 |
+|---|---|---|
+| `(x, z)` | `waist_absolute_source_frame`（默认 `base_footprint`） | 绝对位置 |
+| `phi` | 绕 `waist_absolute_target_frame`（默认 `body_base`）的平面角 | 单位 rad |
+
+控制器查询 TF `source → target`，将 `(x, z)` 变换到 target 系，再相对当前腰部位姿求增量后规划。
+
+默认对齐 **FiveAges W2**（`base_footprint` / `body_base`）。没有这两个 link 的机型需覆盖，例如 ARX Lift / Lift2S：`base_link` / `lift_link`。
+
+仅高度类指令（`waist_lifting`、`waist_lifting_command`、`target_joint_position`）**不依赖**这两个坐标系。
+
+```bash
+ros2 topic pub --once /body_controller/waist_lifting_pose_absolute \
+  std_msgs/msg/Float64MultiArray "{data: [0.12, 0.45, 0.20]}"
+```
+
+### 5.8 腰部升降 — 速度系数
+
+**话题：** `/{controller_name}/waist_lifting_command`  
+**消息类型：** `std_msgs/Float64`（系数范围：`[-1.0, 1.0]`）  
+**前提：** `waist_lifting_enabled: true`，当前状态 MOVEJ
+
+持续速度控制。实际速度 = `factor × waist_lifting_default_parameter[0]`。发送 `0.0` 停止。
+
+```bash
+ros2 topic pub /body_controller/waist_lifting_command std_msgs/msg/Float64 "data: 0.5"   # 上升
+ros2 topic pub --once /body_controller/waist_lifting_command std_msgs/msg/Float64 "data: 0.0"  # 停止
+```
+
+### 5.9 腰部转向 — 速度系数
+
+**话题：** `/{controller_name}/waist_turning_command`  
+**消息类型：** `std_msgs/Float64`（系数范围：`[-1.0, 1.0]`）  
+**前提：** `waist_lifting_enabled: true`，当前状态 MOVEJ
+
+持续速度控制。实际速度 = `factor × waist_turning_default_parameter[0]`。发送 `0.0` 停止。
+
+```bash
+ros2 topic pub /body_controller/waist_turning_command std_msgs/msg/Float64 "data: -0.3"  # 左转
+```
+
+---
+
+## 6. 话题汇总
+
+以控制器名称 `my_controller` 为例：
+
+| 话题 | 消息类型 | 生效状态 | 说明 |
+|---|---|---|---|
+| `/fsm_command` | `Int32` | 任意 | FSM 状态/构型切换 |
+| `/my_controller/target_joint_position` | `Float64MultiArray` | MOVEJ | 直接关节目标；tanh/linear/doubles 限速，必要时拉长 duration |
+| `/my_controller/target_joint_trajectory` | `JointTrajectory` | MOVEJ | 多路点轨迹 |
+| `/my_controller/target_command` | `Int32` (0/1) | MOVEJ | 灵巧手开关控制 |
+| `/my_controller/target_percent` | `Float64` (0~1) | MOVEJ | 灵巧手比例控制 |
+| `/my_controller/waist_lifting` | `Float64` | MOVEJ | 腰部升降距离 |
+| `/my_controller/waist_lifting_pose_relative` | `Float64MultiArray` | MOVEJ | 腰部局部相对位移 `[dx, dz, dphi]` |
+| `/my_controller/waist_lifting_pose_absolute` | `Float64MultiArray` | MOVEJ | 绝对目标 `[x, z, phi]`（TF 坐标系可配置） |
+| `/my_controller/waist_lifting_command` | `Float64` | MOVEJ | 腰部升降速度系数 |
+| `/my_controller/waist_turning_command` | `Float64` | MOVEJ | 腰部转向速度系数 |
+
+---
+
+## 7. Demo Launch 文件
+
+```bash
+source ~/ros2_ws/install/setup.bash
+
+# 启动头部和身体控制器（默认）
+ros2 launch basic_joint_controller demo.launch.py robot:=fiveages_w1
+
+# 只启动头部控制器
+ros2 launch basic_joint_controller demo.launch.py robot:=fiveages_w1 enable_body:=false
+
+# 只启动身体控制器
+ros2 launch basic_joint_controller demo.launch.py robot:=fiveages_w1 enable_head:=false
+```
+
+| 参数 | 默认值 | 说明 |
+|---|---|---|
+| `robot` | `fiveages_w1` | 机器人名称 |
+| `type` | — | 机器人类型（可选） |
+| `hardware` | `mock_components` | `gz` / `isaac` / `mock_components` |
+| `world` | `dart` | Gazebo 世界名称（仅 `hardware=gz` 时生效） |
+| `enable_head` | `true` | 是否启用头部控制器 |
+| `enable_body` | `true` | 是否启用身体控制器 |
+| `use_rviz` | `true` | 是否启动 RViz |
+
+---
+
+## 8. 实现说明
+
+### 插值算法
+
+Home 和 MoveJ 状态均支持可配置插值方式：
+
+- **`tanh`**（默认）：S 形曲线，平滑加减速
+  ```
+  phase = tanh(t/T × scale)
+  pos   = start + phase × (target − start)
+  ```
+  对 `target_joint_position`，T 至少为 `movej_duration`，并会拉长以使起点峰值速度不超过 `movej_max_velocity`。
+- **`linear`**：匀速插值。`target_joint_position` 同样把 duration 当下限并受最大速度约束。
+- **`doubles`**：lina_planning 的 S 曲线（速度/加速度/jerk）。`target_joint_position` 语义同上。
+- **`none`**：立刻跳到目标，不做插值，也不限速。
+
+### 线程安全
+
+`StateMoveJ::setTargetPosition()` 内部使用互斥锁保护，可从任意 ROS 回调线程安全调用。

@@ -1,0 +1,142 @@
+//
+// Created by tlab-uav on 24-9-13.
+//
+
+#ifndef JOYSTICK_TELEOP_H
+#define JOYSTICK_TELEOP_H
+
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/joy.hpp>
+#include <arms_ros2_control_msgs/msg/inputs.hpp>
+#include <arms_ros2_control_msgs/msg/teleop_mode.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include <std_msgs/msg/float64.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+
+class JoystickTeleop final : public rclcpp::Node {
+public:
+    JoystickTeleop();
+
+    ~JoystickTeleop() override = default;
+
+private:
+    void joy_callback(sensor_msgs::msg::Joy::SharedPtr msg);
+    void processButtons(const sensor_msgs::msg::Joy::SharedPtr msg);
+    void processAxes(const sensor_msgs::msg::Joy::SharedPtr msg);
+    void processChassisAxes(const sensor_msgs::msg::Joy::SharedPtr msg);
+    void processGripperTriggers(const sensor_msgs::msg::Joy::SharedPtr msg);
+    double applyDeadzone(double value, double deadzone = 0.1) const;
+    double readTriggerAxis(const sensor_msgs::msg::Joy::SharedPtr msg, int axis_index) const;
+    bool isButtonPressed(const sensor_msgs::msg::Joy::SharedPtr msg, int index) const;
+
+    struct DpadAxes {
+        double x{0.0};
+        double y{0.0};
+    };
+    DpadAxes readDpad(const sensor_msgs::msg::Joy::SharedPtr msg) const;
+    void loadParameters();
+    void printButtonMapping();
+    void publishTeleopMode();
+
+    arms_ros2_control_msgs::msg::Inputs inputs_;
+    rclcpp::Publisher<arms_ros2_control_msgs::msg::Inputs>::SharedPtr publisher_;
+    rclcpp::Publisher<arms_ros2_control_msgs::msg::TeleopMode>::SharedPtr teleop_mode_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr fsm_command_publisher_;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr chassis_publisher_;
+    rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscription_;
+
+    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr waist_lifting_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr waist_turning_publisher_;
+
+    // Control parameters
+    double updateRate_;
+    
+    // State management
+    bool enabled_;
+    rclcpp::Time lastUpdateTime_;
+    
+    // Control mode (ARM_MODE or CHASSIS_MODE)
+    enum ControlMode {
+        ARM_MODE = 0,      // 控制机械臂
+        CHASSIS_MODE = 1   // 控制底盘
+    };
+    ControlMode current_mode_;
+    
+    // Button state tracking for edge detection
+    bool last_x_pressed_;
+    bool last_a_pressed_;
+    bool last_b_pressed_;
+    bool last_y_pressed_;
+    bool last_lb_pressed_;
+    bool last_rb_pressed_;
+    bool last_back_pressed_;
+    bool last_start_pressed_;
+    bool last_left_stick_pressed_;
+    bool last_right_stick_pressed_;
+    
+    // Target arm selection (1=left, 2=right)
+    int32_t currentTarget_;
+
+    // Gripper command state tracking (removed - using target_command subscriptions instead)
+
+    double left_gripper_ratio_;
+    double right_gripper_ratio_;
+    double gripper_step_per_tick_;
+    
+    // Button mapping configuration
+    struct ButtonMapping {
+        int x_button;
+        int a_button;
+        int b_button;
+        int y_button;
+        int lb_button;
+        int rb_button;
+        int back_button;
+        int start_button;
+        int left_stick_button;
+        int right_stick_button;
+        int dpad_up;
+        int dpad_down;
+        int dpad_left;
+        int dpad_right;
+    } button_map_;
+    
+    // Axes mapping configuration
+    struct AxesMapping {
+        int left_stick_x;
+        int left_stick_y;
+        int right_stick_x;
+        int right_stick_y;
+        int dpad_x;
+        int dpad_y;
+        int left_trigger;
+        int right_trigger;
+        double deadzone;
+        double dpad_deadzone;
+        double trigger_deadzone;
+    } axes_map_;
+    
+    // Mirror movement configuration
+    bool mirror_movement_;
+    
+    // Speed mode (true = high speed, false = low speed)
+    bool high_speed_mode_;
+    
+    // Speed scaling factors
+    double low_speed_scale_;
+    double high_speed_scale_;
+    // Activation threshold for arm axes in ARM mode
+    double arm_axes_activation_threshold_{0.5};
+    
+    // Chassis speed scaling factors
+    double chassis_linear_scale_;
+    double chassis_angular_scale_;
+    
+    // Chassis command message
+    geometry_msgs::msg::Twist chassis_cmd_;
+    
+    // Last FSM command sent (to detect transition to 0)
+    int32_t last_fsm_command_;
+};
+
+#endif //JOYSTICK_TELEOP_H 

@@ -1,0 +1,105 @@
+cmake_minimum_required(VERSION 3.14)
+project(arms_target_manager)
+
+if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif ()
+
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(TARGET_MANAGER_INCLUDE_DEPENDS
+        rclcpp
+        geometry_msgs
+        visualization_msgs
+        interactive_markers
+        arms_ros2_control_msgs
+        arms_controller_common
+        tf2_ros
+        tf2_geometry_msgs
+        std_msgs
+        nav_msgs
+        controller_manager_msgs
+        Eigen3
+)
+
+# find dependencies
+find_package(ament_cmake REQUIRED)
+foreach (Dependency IN ITEMS ${TARGET_MANAGER_INCLUDE_DEPENDS})
+    find_package(${Dependency} REQUIRED)
+endforeach ()
+
+add_library(${PROJECT_NAME} SHARED
+        src/ArmsTargetManager.cpp
+        src/MarkerFactory.cpp
+        src/ControlInputHandler.cpp
+        src/VRInputHandler.cpp
+        src/marker/HeadMarker.cpp
+        src/marker/ArmMarker.cpp
+        src/marker/BodyMarker.cpp
+)
+
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
+        PRIVATE
+        src)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        ${rclcpp_TARGETS}
+        ${geometry_msgs_TARGETS}
+        ${visualization_msgs_TARGETS}
+        ${interactive_markers_TARGETS}
+        ${arms_ros2_control_msgs_TARGETS}
+        arms_controller_common::arms_controller_common
+        ${tf2_ros_TARGETS}
+        ${tf2_geometry_msgs_TARGETS}
+        ${std_msgs_TARGETS}
+        ${nav_msgs_TARGETS}
+        ${controller_manager_msgs_TARGETS}
+        Eigen3::Eigen
+)
+
+add_executable(arms_target_manager_node src/arms_target_manager_node.cpp)
+target_link_libraries(arms_target_manager_node ${PROJECT_NAME})
+
+# Ensure the loader finds libarms_target_manager.so next to the executable (same dir as install).
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set_target_properties(arms_target_manager_node PROPERTIES
+    BUILD_RPATH "$ORIGIN"
+    INSTALL_RPATH "$ORIGIN"
+    BUILD_WITH_INSTALL_RPATH FALSE
+  )
+endif()
+
+install(
+        DIRECTORY include/
+        DESTINATION include/${PROJECT_NAME}
+)
+
+install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT export_${PROJECT_NAME}
+        ARCHIVE DESTINATION lib/${PROJECT_NAME}
+        LIBRARY DESTINATION lib/${PROJECT_NAME}
+        RUNTIME DESTINATION bin
+)
+
+install(
+        TARGETS arms_target_manager_node
+        DESTINATION lib/${PROJECT_NAME}
+)
+
+# Launch files are now handled by robot_common_launch utilities
+# No need to install launch directory anymore
+
+install(
+        DIRECTORY config/
+        DESTINATION share/${PROJECT_NAME}/config
+)
+
+ament_export_dependencies(${TARGET_MANAGER_INCLUDE_DEPENDS})
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+
+ament_package()

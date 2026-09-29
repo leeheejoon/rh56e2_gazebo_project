@@ -1,0 +1,233 @@
+import launch
+from ament_index_python.packages import get_package_share_directory
+import os
+from launch import LaunchDescription
+from launch.actions import OpaqueFunction
+
+# Import robot_common_launch utilities
+from robot_common_launch import (
+    get_robot_package_path,
+    resolve_planning_urdf_file_or_fail,
+    create_robot_profile_launch_arguments,
+)
+
+
+# Planning-only launch (no ros2_control); xacro mappings use a fixed hardware placeholder.
+_PLANNING_XACRO_HARDWARE = "mock_components"
+
+
+def _detect_pinocchio_version():
+    """Best-effort detection of the installed pinocchio version (string or None).
+
+    Tries ``pkg-config --modversion pinocchio`` first, then scans common
+    ``pinocchio/config.hpp`` locations and extracts ``PINOCCHIO_VERSION``.
+    """
+    import subprocess
+    try:
+        out = subprocess.check_output(
+            ['pkg-config', '--modversion', 'pinocchio'],
+            stderr=subprocess.DEVNULL, text=True, timeout=2,
+        ).strip()
+        if out:
+            return out
+    except (OSError, subprocess.SubprocessError):
+        pass
+    import re
+    pattern = re.compile(r'#\s*define\s+PINOCCHIO_VERSION\s+"([^"]+)"')
+    for hdr in ('/opt/ros/jazzy/include/pinocchio/config.hpp',
+                '/opt/ros/kilted/include/pinocchio/config.hpp',
+                '/usr/include/pinocchio/config.hpp'):
+        try:
+            with open(hdr, 'r') as fh:
+                for line in fh:
+                    m = pattern.search(line)
+                    if m:
+                        return m.group(1)
+        except OSError:
+            continue
+    return None
+
+
+def _ocs2_codegen_dir(pkg, sub=''):
+    """Resolve CppAD code-gen cache directory for *pkg*.
+
+    Default: ``/tmp/ocs2_<USER>_<UID>/<pkg>/auto_generated[/pinocchio-<ver>]/<sub>``
+    Override via env var ``OCS2_CODEGEN_DIR``.
+
+    Living under /tmp means a fresh boot guarantees the cache is rebuilt, so
+    system upgrades (e.g. pinocchio) cannot silently leave stale ABI .so.
+    Additionally, when pinocchio is detectable on this host, the cache path is
+    suffixed with the pinocchio version — apt-upgrading pinocchio thus moves
+    the cache to a fresh subdirectory automatically, without a reboot.
+    """
+    base = os.environ.get('OCS2_CODEGEN_DIR') or \
+        f"/tmp/ocs2_{os.environ.get('USER', 'anon')}_{os.getuid()}"
+    parts = [base, pkg, 'auto_generated']
+    version = _detect_pinocchio_version()
+    if version:
+        parts.append(f'pinocchio-{version}')
+    if sub:
+        parts.extend(p for p in sub.split('/') if p)
+    return os.path.join(*parts)
+
+
+def generate_launch_description():
+    """
+    通用的机器人OCS2 launch文件
+    
+    使用方法:
+    ros2 launch robot_common_launch manipulator_ocs2.launch.py robot_name:=cr5
+    ros2 launch robot_common_launch manipulator_ocs2.launch.py robot_name:=franka
+    ros2 launch robot_common_launch manipulator_ocs2.launch.py robot_name:=cr5 type:=red
+    ros2 launch robot_common_launch manipulator_ocs2.launch.py robot_name:=piper type:=long_arm
+    ros2 launch robot_common_launch manipulator_ocs2.launch.py robot_name:=cr5 task_file:=task_custom
+    ros2 launch robot_common_launch manipulator_ocs2.launch.py robot_name:=cr5 type:=red task_file:=task_red
+    ros2 launch robot_common_launch manipulator_ocs2.launch.py robot_name:=m6_ccs type:=rg75
+    """
+    
+    # 机器人名称参数
+    robot_name = launch.actions.DeclareLaunchArgument(
+        name='robot_name',
+        default_value='cr5',
+        description='Name of the robot (e.g., cr5, piper, x5, etc.)'
+    )
+
+    # 机器人类型参数
+    robot_type = launch.actions.DeclareLaunchArgument(
+        name='type',
+        default_value='',
+        description='Robot type/variant (e.g., red, blue, long_arm, short_arm, etc.). If empty, uses default configuration.'
+    )
+
+    debug = launch.actions.DeclareLaunchArgument(
+        name='debug',
+        default_value='false',
+        description='Whether to enable debug mode'
+    )
+
+    # 手柄控制参数
+    enable_joystick = launch.actions.DeclareLaunchArgument(
+        name='enable_joystick',
+        default_value='false',
+        description='Whether to enable joystick control for single arm mode'
+    )
+
+    joystick_device = launch.actions.DeclareLaunchArgument(
+        name='joystick_device',
+        default_value='/dev/input/js0',
+        description='Joystick device path (e.g., /dev/input/js0)'
+    )
+
+    # OCS2任务文件参数
+    task_file = launch.actions.DeclareLaunchArgument(
+        name='task_file',
+        default_value='task',
+        description='OCS2 task file name (without .info extension, e.g., task, task_custom, etc.)'
+    )
+
+    def launch_setup(context, *args, **kwargs):
+        robot_name_value = context.launch_configurations['robot_name']
+        type_value = context.launch_configurations['type']
+        debug_value = context.launch_configurations['debug']
+        enable_joystick_value = context.launch_configurations['enable_joystick']
+        joystick_device_value = context.launch_configurations['joystick_device']
+        task_file_value = context.launch_configurations['task_file']
+        
+        # 生成带类型的机器人标识符
+        robot_identifier = robot_name_value
+        if type_value and type_value.strip():
+            robot_identifier = f"{robot_name_value}_{type_value}"
+            print(f"🚀 Launching OCS2 for robot: {robot_name_value} (type: {type_value})")
+        else:
+            print(f"🚀 Launching OCS2 for robot: {robot_name_value} (default type)")
+        
+        # 手柄配置信息
+        if enable_joystick_value == 'true':
+            print(f"🎮 Joystick control enabled:")
+            print(f"   - Device: {joystick_device_value}")
+        else:
+            print(f"🎮 Joystick control disabled")
+        
+        # 使用 robot_common_launch 工具获取机器人包路径
+        robot_pkg_path = get_robot_package_path(robot_name_value)
+        if robot_pkg_path is None:
+            print(f"❌ Error: Could not find {robot_name_value}_description package")
+            return []
+        
+        urdf_file_value = resolve_planning_urdf_file_or_fail(
+            robot_name_value,
+            context.launch_configurations,
+            _PLANNING_XACRO_HARDWARE,
+            planning_scope="",
+        )
+        if not urdf_file_value:
+            print(f"❌ Error: No xacro planning URDF for robot '{robot_name_value}'")
+            return []
+        print(f"📁 URDF (xacro): {urdf_file_value}")
+        
+        # 构建任务文件路径
+        task_file_path = os.path.join(
+            robot_pkg_path,
+            'config', 'ocs2', f'{task_file_value}.info'
+        )
+        print(f"📁 Task file: {task_file_path}")
+        
+        try:
+            # lib folder路径 - 包含类型信息
+            lib_folder_value = _ocs2_codegen_dir('ocs2_mobile_manipulator', robot_identifier)
+            print(f"📁 Lib folder: {lib_folder_value}")
+        except Exception as e:
+            print(f"❌ Error: Could not find ocs2_mobile_manipulator package: {e}")
+            return []
+
+        # 启动mobile_manipulator，RViz自动启动
+        try:
+            mobile_manipulator = launch.actions.IncludeLaunchDescription(
+                launch.launch_description_sources.PythonLaunchDescriptionSource(
+                    os.path.join(get_package_share_directory(
+                        'ocs2_mobile_manipulator_ros'), 'launch/include/mobile_manipulator.launch.py')
+                ),
+                launch_arguments={
+                    'rviz': 'true',  # 自动启动RViz
+                    'debug': debug_value,
+                    'urdfFile': urdf_file_value,
+                    'taskFile': task_file_path,
+                    'libFolder': lib_folder_value,
+                    'enableJoystick': enable_joystick_value,
+                }.items()
+            )
+            print("✅ Mobile manipulator configured successfully (RViz will auto-start)")
+            
+            # 如果启用手柄，添加joy_node
+            nodes_to_return = [mobile_manipulator]
+            if enable_joystick_value == 'true':
+                from launch_ros.actions import Node
+                joy_node = Node(
+                    package='joy',
+                    executable='joy_node',
+                    name='joy_node',
+                    parameters=[{
+                        'dev': joystick_device_value,
+                        'deadzone': 0.05,
+                        'autorepeat_rate': 20.0
+                    }],
+                    output='screen'
+                )
+                nodes_to_return.append(joy_node)
+                print("✅ Joy node added for joystick control")
+            
+            return nodes_to_return
+        except Exception as e:
+            print(f"❌ Error launching mobile_manipulator: {e}")
+            return []
+
+    return LaunchDescription([
+        robot_name,
+        robot_type,
+        debug,
+        enable_joystick,
+        joystick_device,
+        task_file,
+        *create_robot_profile_launch_arguments(),
+        OpaqueFunction(function=launch_setup),
+    ])

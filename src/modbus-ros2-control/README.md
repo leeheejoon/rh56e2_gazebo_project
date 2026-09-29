@@ -1,0 +1,257 @@
+# Modbus ROS2 Control
+
+通用的 Modbus / RS485 末端执行器 ROS2 Control 硬件接口，支持夹爪与多种灵巧手。
+
+## 1. 支持的末端执行器
+
+本包注册 **7 个** `hardware_interface` 插件（见 `modbus_ros2_control.xml`）：
+
+| 插件 | 产品 | 识别 / 配置方式 |
+|------|------|-----------------|
+| **`ModbusHardware`** | Changingtek AG2F90 | `gripper_type:=changingtek`，`variant:=90c` / `90d` |
+| **`DexterousHandHardware`** | LinkerHand **O7** | URDF 7 关节 |
+| | LinkerHand **O6** | URDF 6 关节（默认） |
+| | LinkerHand **L6** | `hand_type` 含 `L6` |
+| | Freedom / Inspire | **不支持** — 初始化失败，请用对应专用插件 |
+| **`InspireHandHardware`** | Inspire **RH56 系列**（E2 / F2） | URDF 6 关节；Modbus RTU（FC03/FC10）；限位写死为 RH56E2 |
+| **`FreedomRS485Hardware`** | Freedom **V1** / **V2** | `protocol_version:=auto` / `freedomv1` / `freedomv2`（或按关节数推断） |
+| **`XHand1RS485Hardware`** | **XHand1** | URDF 12 关节；专用 RS485（默认 3 Mbps） |
+| **`TheoHandModbusHardware`** | TheoHand **STD16A** | URDF 16 关节；标准 Modbus RTU（默认 115200 8N1） |
+| **`Kwr75ForceTorqueSensor`** | **KWR75** 六轴力传感器 | `type="sensor"`；专用 RS485（默认 2.5 Mbps） |
+
+**Inspire 请使用 `InspireHandHardware`**
+
+- `hand_type` 含 `INSPIRE` 或 `RH56` 时，`DexterousHandHardware` 会拒绝初始化。
+- USB 路径请用 `inspire_description` 的 `inspire_rs485_side_system` 宏（见 [§3.3](#33-inspire-rh56inspirehandhardware)）。
+
+推荐在机器人 description 包中通过 xacro 宏接线，而非手写完整关节块（见 [§3 配置参考](#3-配置参考)）。
+
+## 2. 代码结构
+
+```
+modbus_ros2_control/
+├── communicator/
+│   └── ModbusRtuCommunicator          # libmodbus 封装
+├── grippers/
+│   ├── ModbusGripperBase
+│   └── ChangingtekGripper             # ModbusHardware
+├── hands/
+│   ├── linkerhand/                    # DexterousHandHardware
+│   ├── inspire/                       # InspireHandHardware
+│   ├── freedom/                       # FreedomRS485Hardware
+│   ├── theo/                          # TheoHandModbusHardware
+│   └── xhand1/                        # XHand1RS485Hardware
+├── sensors/
+│   └── kwr75_force_torque_sensor.cpp  # Kwr75ForceTorqueSensor
+├── modbus_hardware.cpp                # 夹爪插件入口
+└── modbus_ros2_control.xml            # 插件清单
+```
+
+夹爪路径复用 `gripper_hardware_common`（Changingtek、LinkerHand `DexterousHandHardware`）。`InspireHandHardware` 协议逻辑在包内自包含，与 `marvin_ros2_control` 并行实现（见 [§9 TODO](#9-todo)）。
+
+## 3. 配置参考
+
+关节接口定义放在各 `*_description` 包；此处仅示硬件插件与关键参数。完整关节列表请 include 对应 xacro。
+
+### 3.1 Changingtek 夹爪（`ModbusHardware`）
+
+```xml
+<ros2_control name="ModbusGripperSystem" type="system">
+  <hardware>
+    <plugin>modbus_ros2_control/ModbusHardware</plugin>
+    <param name="gripper_type">changingtek</param>
+    <param name="variant">90c</param>
+    <!-- 可选: serial_port, slave_id, baudrate -->
+  </hardware>
+  <joint name="gripper_joint">
+    <command_interface name="position"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+    <state_interface name="effort"/>
+  </joint>
+</ros2_control>
+```
+
+### 3.2 LinkerHand（`DexterousHandHardware`）
+
+```xml
+<ros2_control name="linkerhand_right_system" type="system">
+  <hardware>
+    <plugin>modbus_ros2_control/DexterousHandHardware</plugin>
+    <param name="serial_port">/dev/ttyUSB0</param>
+    <param name="hand_side">right</param>
+    <param name="hand_type">linkerhand_o7</param>
+  </hardware>
+  <!-- include linkerhand_description xacro 宏，如 linkerhand_o7_interfaces -->
+</ros2_control>
+```
+
+参考：`linkerhand_description/xacro/ros2_control/hand.xacro`（单臂 launch）、各机器人 `robot.xacro` 中的 `side_usb_hand_system`。
+
+### 3.3 Inspire RH56（`InspireHandHardware`）
+
+```xml
+<!-- 推荐直接使用 inspire_description 宏 -->
+<xacro:inspire_rs485_side_system side="left" serial_port="/dev/ttyUSB0" hand_type="inspire_f2"/>
+```
+
+宏定义：`inspire_description/xacro/ros2_control/side_systems.xacro`  
+单臂示例：`inspire_description/xacro/ros2_control/hand.xacro`
+
+### 3.4 Freedom / XHand1
+
+```xml
+<xacro:freedom_rs485_side_system side="left" serial_port="/dev/ttyUSB0" type="freedomv2"/>
+<xacro:xhand1_rs485_side_system side="left" serial_port="/dev/ttyUSB1"/>
+```
+
+宏定义：`freedom_description`、`xhand1_description` 的 `xacro/ros2_control/side_systems.xacro`。
+
+### 3.5 TheoHand STD16A（`TheoHandModbusHardware`）
+
+```xml
+<ros2_control name="theohand_system" type="system">
+  <hardware>
+    <plugin>modbus_ros2_control/TheoHandModbusHardware</plugin>
+    <param name="serial_port">/dev/ttyUSB0</param>
+    <param name="baudrate">115200</param>
+    <param name="slave_id">2</param>
+  </hardware>
+  <!-- include theohand_description/xacro/ros2_control/std16a.xacro -->
+</ros2_control>
+```
+
+插件按官方 `wn_hand_sdk-develop_modbus` demo 在激活时写控制字 `0x0f`。STD16A 当前按传入
+`slave_id` 直接通信，不在激活阶段读取左右手寄存器。
+
+### 3.6 KWR75 六轴力传感器（`Kwr75ForceTorqueSensor`）
+
+在 `m6_ccs_description/xacro/ros2_control/ft_sensor_systems.xacro` 中按真机配置自动挂载（与 `external_ee_systems` 相同模式）：
+
+```xml
+<xacro:ft_sensor_systems
+  usb_left_ft_port="$(arg usb_left_ft_port)"
+  usb_right_ft_port="$(arg usb_right_ft_port)"/>
+```
+
+串口可通过 `robot.local.yaml` → `hardware.usb_left_ft_port` 覆盖，或 launch 传 `hardware_usb_left_ft_port:=/dev/ttyUSB1`。
+
+插件导出 ros2_control 状态接口（`kwr75_{left|right}_ft/force.x` …），并发布 `WrenchStamped` 到 `/left_arm_external_wrench`、`/right_arm_external_wrench` 供上层控制器订阅。`MarvinHardware` 不订阅这些 topic。串口不可用或读失败时输出全 0。
+
+协议与坤维官方 SDK（`kwcapture.h`，`linkMode=0`、`decodeMode=0`、`kwStartCapture`）一致：激活时发送一次 `0x48 0xAA 0x0D 0x0A` 启动 1kHz 连续流，之后只读串口缓冲中的最新 28 字节帧，不再每周期 flush/重发命令。
+
+## 4. 硬件参数
+
+| 插件 | 参数 | 默认 | 说明 |
+|------|------|------|------|
+| **ModbusHardware** | `gripper_type` | `changingtek` | 必需 |
+| | `variant` | `90c` | `90c` / `90d` |
+| | `serial_port` | `/dev/ttyUSB0` | |
+| | `slave_id` | `1` | |
+| | `baudrate` | `115200` | |
+| **DexterousHandHardware** | `serial_port` | — | 必需 |
+| | `hand_side` | `right` | `left` / `right`；左 `0x28`，右 `0x27` |
+| | `hand_type` | `simple_dexterous_hand` | 区分 O6 / L6；含 `INSPIRE` / `RH56` 会拒绝 |
+| | `left_tool_torque` / `right_tool_torque` | `1.0` | 对应侧 LinkerHand 设备力矩比例，范围 `[0, 1]` |
+| | `left_tool_velocity` / `right_tool_velocity` | `1.0` | 对应侧 LinkerHand 设备速度比例，范围 `[0, 1]` |
+| | `response_timeout_ms` | `20` | Modbus 响应超时 |
+| | `byte_timeout_ms` | `5` | Modbus 字节间超时 |
+| | 串口格式 | 固定 | 115200 8N1 |
+| **InspireHandHardware** | `serial_port` | `/dev/ttyUSB0` | |
+| | `hand_side` | `left` | `slave_id:=auto` 时左 `2`、右 `1` |
+| | `slave_id` | `auto` | |
+| | `baudrate` | `115200` | |
+| | `read_feedback` | `true` | |
+| **FreedomRS485Hardware** | `protocol_version` | `auto` | `freedomv1` / `freedomv2` |
+| | `serial_port` | `/dev/ttyUSB0` | |
+| | `hand_side` | — | |
+| | `command_speed` | `100` | |
+| **XHand1RS485Hardware** | `serial_port` | `/dev/ttyUSB0` | |
+| | `baudrate` | `3000000` | |
+| | `hand_id` / `host_id` | `0` / `0xFE` | |
+| | `kp` / `ki` / `kd` | `100` / `0` / `0` | 随每帧下发 |
+| | `torque_limit` | `300` | 基础力矩上限，范围 `[0, 300]` |
+| | `tool_torque` | `0.8` | 力矩比例 ratio，范围 `[0, 1]`；下发值为 `round(torque_limit × ratio)`，默认即 `round(300 × ratio)` |
+| | `tool_velocity` | `0.0` | 默认不限速。速度比例：`0 < ratio <= 1` 按比例限速；有限值 `ratio <= 0` 不限速，直接下发目标位置（仍保留关节位置限位）。负数内部归一为 0；支持运行时修改 |
+| | FTDI USB 缓冲定时器 | `1 ms` | 打开串口时自动设置并读回验证，支持串口符号链接；无该属性时跳过，无写权限时告警并继续 |
+| **TheoHandModbusHardware** | `serial_port` | `/dev/ttyUSB0` | |
+| | `baudrate` | `115200` | 协议 6.1：RS485 115200 8N1 |
+| | `slave_id` | 左 `2`、右 `1` | 可按设备地址覆盖 |
+| | `read_feedback` | `true` | 读取 `0x0051` 起的 16 个实际位置；关闭后 RViz 显示命令位置 |
+| **Kwr75ForceTorqueSensor** | `serial_port` | `/dev/ttyUSB0` | USB-RS485 转换器 |
+| | `baudrate` | `115200` | 8N1，与坤维 SDK `decodeMode=0` 一致 |
+| | `command_code` | `72` (`0x48`) | 启动连续采集命令首字节；部分设备为 `0x49` |
+| | `convert_to_si` | `true` | Kg→N，Kg·m→N·m |
+| | `response_timeout_ms` | `50` | 单次读流超时（ms） |
+| | `startup_delay_ms` | `50` | 发送启动命令后等待首帧（ms） |
+| | `warmup_attempts` | `20` | 激活时握手重试次数 |
+
+所有本包直接管理的 USB-RS485 串口在连接时默认尝试将 `latency_timer` 设置为 **1 ms**，并读回验证。该逻辑共用同一实现，覆盖 Modbus RTU 路径（LinkerHand、Inspire、TheoHand、ChangingTek、Jodell 等）、Freedom、XHand1，以及 KWR75 串口传感器；重新连接时也会执行。
+
+支持 `/dev/serial/by-id/...` 等符号链接。没有 `latency_timer` 属性的适配器和原生串口会跳过；无 sysfs 写权限时告警并继续通信，不会自动提权。若普通用户需要在重新插拔后自动生效，应配置系统 udev 权限或由系统设置该属性。此设置调整的是 USB 接收缓冲，不改变波特率、协议超时或设备内部控制频率。
+
+## 5. 位置单位
+
+| 末端 | ROS2 Control 接口 | 设备协议 |
+|------|-------------------|----------|
+| Changingtek 夹爪 | 0.0（闭合）~ 1.0（打开） | 0–9000（0=开，9000=合） |
+| LinkerHand O6/O7 | 0.0 ~ 1.0（弯曲→伸直） | 0–255 |
+| Inspire RH56 | 弧度（rad） | 寄存器原始值约 500–1750 |
+| Freedom / XHand1 | 弧度（rad） | 各协议自定义映射 |
+| TheoHand STD16A | 弧度 / 米（按 URDF 关节限位归一化） | 0–9000（协议位置单位约等于 0.01 deg） |
+
+## 6. 编译与依赖
+
+**系统依赖**
+
+```bash
+sudo apt-get install libmodbus-dev
+sudo apt-get install ros-${ROS_DISTRO}-controller-manager \
+                     ros-${ROS_DISTRO}-joint-state-broadcaster \
+                     ros-${ROS_DISTRO}-position-controllers
+```
+
+**编译**
+
+```bash
+cd ~/ros2_ws
+colcon build --packages-up-to modbus_ros2_control --symlink-install
+source install/setup.bash
+```
+
+**ROS 包依赖**：`hardware_interface`、`pluginlib`、`rclcpp`、`rclcpp_lifecycle`、`gripper_hardware_common`、`arms_controller_common`。
+
+## 7. 启动示例
+
+以 LinkerHand O7 独立调试为例（`basic_joint_controller` + `linkerhand_description`）：
+
+```bash
+# 串口权限（任选其一）
+sudo usermod -a -G dialout $USER && newgrp dialout
+# 或: sudo chmod 666 /dev/ttyUSB0
+
+# 启动
+ros2 launch basic_joint_controller hand.launch.py \
+  hand:=linkerhand type:=o7 hardware:=real direction:=1
+
+# 发令 / 查看状态
+ros2 topic pub /hand_joint_controller/commands std_msgs/msg/Float64MultiArray \
+  "{data: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]}"
+ros2 topic echo /joint_states
+ros2 control list_controllers
+```
+
+Inspire 单臂：`inspire_description` + `hand.launch.py`（`hardware:=real`）。双臂整机见各机器人 description 的 `robot.xacro` 与 launch。
+
+自定义 launch 要点：xacro 生成 URDF → `ros2_control_node` → 加载 `joint_state_broadcaster` 与位置控制器。可参考 `basic_joint_controller/launch/hand.launch.py`。
+
+## 8. 扩展新夹爪
+
+1. 继承 `ModbusGripperBase` 实现协议读写。
+2. 在 `ModbusHardware::on_init()` 中按 `gripper_type` 实例化。
+3. 在 `modbus_ros2_control.xml` 中注册（若为新 `SystemInterface` 则另建插件类）。
+
+## 9. TODO
+
+- [ ] **抽取 Inspire 协议公共层** — `InspireHandHardware` 与 `marvin_ros2_control::InspireHandE2`（及 CAN FD 变体）各自实现同一套寄存器协议，未复用 `gripper_hardware_common`。后续抽到 common 供 Marvin / modbus / can 共用。
+- [ ] **RH56F2 限位** — `InspireHandHardware` 关节上限仍写死为 RH56E2；F2 真机需按型号区分或从 URDF 读取。

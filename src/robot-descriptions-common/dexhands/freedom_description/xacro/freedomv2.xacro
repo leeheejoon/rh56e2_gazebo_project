@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="FreedomHandV2" params="name direction:=1 fixed_joints:=false">
+		<xacro:property name="prefix" value="${name + '_' if name else ''}"/>
+		<xacro:property name="joint_type" value="${fixed_joints and 'fixed' or 'revolute'}"/>
+
+		<link name="${prefix}hand_base">
+			<inertial>
+				<origin xyz="1.72456639246921E-10 0.000159743547726118 0.00658240409197629" />
+				<mass value="0.0176998254464378"/>
+				<inertia ixx="4.77814014865034E-06" ixy="-2.8287088790031E-15" ixz="-1.75792865725827E-14"
+				         iyy="4.84927762663746E-06" iyz="4.47414433687868E-09" izz="9.23717647630549E-06"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/flange.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/flange.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<link name="${prefix}p_link1">
+			<inertial>
+				<origin xyz="-0.000806915097716 ${direction*0.00388610492404} 0.0525721443156" />
+				<mass value="3.09350498281211"/>
+				<inertia ixx="0.00483124658726801" ixy="${direction*-0.000120079243984}" ixz="2.7699838991495E-05"
+				         iyy="0.00363360625618824" iyz="${direction*0.000130624066360049}" izz="0.00244702121245661"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/hand_base.glb"
+					      scale="1 ${direction} 1"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/hand_base.glb"
+					      scale="1 ${direction} 1"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}p_joint1" type="fixed">
+			<origin xyz="0 0 0.009" />
+			<parent link="${prefix}hand_base"/>
+			<child link="${prefix}p_link1"/>
+		</joint>
+
+		<link name="${prefix}f_link1_1">
+			<inertial>
+				<origin xyz="0.00145107 ${direction*0.000219751} -0.000948786" />
+				<mass value="0.02293794994852"/>
+				<inertia ixx="1.34683661171916E-06" ixy="${direction*-2.07744949992747E-08}" ixz="7.89788182035335E-08"
+				         iyy="1.55245577209657E-06" iyz="${direction*2.67848599029428E-08}" izz="1.3933432603089E-06"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/thumb_link1.glb"/>
+				</geometry>
+			</visual>
+		</link>
+
+		<joint name="${prefix}thumb_joint1" type="${joint_type}">
+			<origin xyz="0.0019629 ${direction*-0.02666} 0.037173" rpy="${direction*-1.571} -0.001553 3.0223E-05"/>
+			<parent link="${prefix}p_link1"/>
+			<child link="${prefix}f_link1_1"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 ${direction*-1}"/>
+				<limit lower="-0.4363" upper="0.43663" effort="10" velocity="1.5"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link1_2">
+			<inertial>
+				<origin xyz="-0.0174478 ${direction*0.0315996} 0.0162964" />
+				<mass value="0.341617867410056"/>
+				<inertia ixx="0.00012471975596469" ixy="${direction*2.83491215843258E-05}" ixz="2.24006738785496E-05"
+				         iyy="8.89744452481692E-05" iyz="${direction*-4.06096513108848E-05}" izz="9.75750752172789E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/thumb_link2.glb"
+					      scale="1 ${direction} 1"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/thumb_link2.glb"
+					      scale="1 ${direction} 1"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}thumb_joint2" type="${joint_type}">
+			<origin xyz="0.010999 0 -0.001747" rpy="${direction*-1.5711} 0 ${direction*-3.1415}"/>
+			<parent link="${prefix}f_link1_1"/>
+			<child link="${prefix}f_link1_2"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 ${direction*1}"/>
+				<limit lower="0" upper="1.3786" effort="10" velocity="1.5"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link1_3">
+			<inertial>
+				<origin xyz="0.0131236 ${direction*-0.00699497} -6.46545E-08" />
+				<mass value="0.0787286292541374"/>
+				<inertia ixx="4.50761163538385E-06" ixy="${direction*-6.41462388372337E-07}" ixz="3.09811891080126E-12"
+				         iyy="7.81743380936836E-06" iyz="${direction*1.33295168138201E-10}" izz="7.87624932256717E-06"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/thumb_link3.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/thumb_link3.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}thumb_joint3" type="${joint_type}">
+			<origin xyz="-0.027292 ${direction*0.049447} 0.045113" rpy="1.5708 -0.97827 ${direction*2.0748}"/>
+			<parent link="${prefix}f_link1_2"/>
+			<child link="${prefix}f_link1_3"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="0.4537" effort="10" velocity="1.5"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link1_4">
+			<inertial>
+				<origin xyz="0.0130337 ${direction*0.00392466} 4.5721E-08" />
+				<mass value="0.0492559822656011"/>
+				<inertia ixx="1.83221974234297E-06" ixy="${direction*-2.92043601142965E-08}" ixz="-1.24987758450123E-11"
+				         iyy="4.14827361187538E-06" iyz="${direction*-1.84821856863993E-13}" izz="3.86182170639597E-06"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/thumb_link4.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/thumb_link4.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}thumb_dip" type="${joint_type}">
+			<origin xyz="0.030304 -0.0075957 0" rpy="0 0 0.31426"/>
+			<parent link="${prefix}f_link1_3"/>
+			<child link="${prefix}f_link1_4"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="0.7" effort="10" velocity="1.5"/>
+				<mimic joint="${prefix}thumb_joint3" multiplier="1.2" offset="0"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link2_1">
+			<inertial>
+				<origin xyz="0.0043155 -3.59545E-05 -0.00029352" />
+				<mass value="0.01220067525638"/>
+				<inertia ixx="1.76157556392802E-07" ixy="-1.18013880311655E-11" ixz="5.1258189712677E-08"
+				         iyy="6.86901221323969E-07" iyz="-5.70496565074483E-13" izz="6.04592917607103E-07"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"
+					      />
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"
+					      />
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}index_spread" type="fixed">
+			<origin xyz="-0.00116057 ${direction*-0.0307705} 0.115175"
+			        rpy="${direction*-0.672265} -1.5707 ${direction*-2.4693}"/>
+			<parent link="${prefix}p_link1"/>
+			<child link="${prefix}f_link2_1"/>
+		</joint>
+
+		<link name="${prefix}f_link2_2">
+			<inertial>
+				<origin xyz="0.0104118 ${direction*0.000536687} -1.76714E-07" />
+				<mass value="0.0784310054995946"/>
+				<inertia ixx="3.68968904398224E-06" ixy="${direction*3.62846908118645E-07}" ixz="2.16090077515739E-10"
+				         iyy="1.11655087077302E-05" iyz="${direction*-8.17126072387152E-11}" izz="1.11880378622959E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"
+					      />
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"
+					      />
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}index_joint" type="${joint_type}">
+			<origin xyz="0.007 0 0.0021" rpy="1.5708 0 0"/>
+			<parent link="${prefix}f_link2_1"/>
+			<child link="${prefix}f_link2_2"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.396" effort="10" velocity="1.5"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link2_3">
+			<inertial>
+				<origin xyz="0.0254086 ${direction*0.00100288} -1.01039E-05" />
+				<mass value="0.041685911200702"/>
+				<inertia ixx="1.69093305742986E-06" ixy="${direction*1.39625672092217E-06}" ixz="-5.80269118862188E-09"
+				         iyy="1.03628643235447E-05" iyz="${direction*1.23011708787116E-09}" izz="1.02474973432913E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"
+					      />
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"
+					      />
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}index_dip" type="${joint_type}">
+			<origin xyz="0.032003 -0.0025 0" rpy="0 0 0.41015"/>
+			<parent link="${prefix}f_link2_2"/>
+			<child link="${prefix}f_link2_3"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.204" effort="10" velocity="1.5"/>
+				<mimic joint="${prefix}index_joint" multiplier="0.8625" offset="0"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link3_1">
+			<inertial>
+				<origin xyz="0.0043155 -3.59545E-05 -0.00029352" />
+				<mass value="0.01220067525638"/>
+				<inertia ixx="1.76157556392802E-07" ixy="-1.18013880316246E-11" ixz="5.12581897126789E-08"
+				         iyy="6.86901221323972E-07" iyz="-5.70496565048013E-13" izz="6.04592917607106E-07"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}middle_spread" type="fixed">
+			<origin xyz="-0.0011607 ${direction*-0.0087207} 0.11685"
+			        rpy="${direction*-0.67227} -1.5707 ${direction*-2.4693}"/>
+			<parent link="${prefix}p_link1"/>
+			<child link="${prefix}f_link3_1"/>
+		</joint>
+
+		<link name="${prefix}f_link3_2">
+			<inertial>
+				<origin xyz="0.0104118 ${direction*0.000536687} -1.76714E-07" />
+				<mass value="0.0784310054995923"/>
+				<inertia ixx="3.68968904398217E-06" ixy="${direction*3.62846908118472E-07}" ixz="2.16090077641213E-10"
+				         iyy="1.11655087077294E-05" iyz="${direction*-8.17126072565028E-11}" izz="1.1188037862295E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}middle_joint" type="${joint_type}">
+			<origin xyz="0.007 0 0.0021" rpy="1.5708 0 0"/>
+			<parent link="${prefix}f_link3_1"/>
+			<child link="${prefix}f_link3_2"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.396" effort="10" velocity="1.5"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link3_3">
+			<inertial>
+				<origin xyz="0.025409 ${direction*0.0010029} -1.0077E-05" />
+				<mass value="0.041686"/>
+				<inertia ixx="1.6909E-06" ixy="${direction*1.3963E-06}" ixz="-5.8025E-09"
+				         iyy="1.0363E-05" iyz="${direction*1.2305E-09}" izz="1.0248E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}middle_dip" type="${joint_type}">
+			<origin xyz="0.032003 -0.0025 0" rpy="0 0 0.41015"/>
+			<parent link="${prefix}f_link3_2"/>
+			<child link="${prefix}f_link3_3"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.204" effort="10" velocity="1.5"/>
+				<mimic joint="${prefix}middle_joint" multiplier="0.8625" offset="0"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link4_1">
+			<inertial>
+				<origin xyz="0.0043155 -3.59545E-05 -0.00029352" />
+				<mass value="0.01220067525638"/>
+				<inertia ixx="1.76157556392802E-07" ixy="-1.18013880314418E-11" ixz="5.12581897126789E-08"
+				         iyy="6.86901221323973E-07" iyz="-5.70496565100953E-13" izz="6.04592917607107E-07"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"
+					      />
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"
+					      />
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}ring_base_joint" type="fixed">
+			<origin xyz="-0.00116056 ${direction*0.0132793} 0.115127"
+			        rpy="${direction*-0.672265} -1.5707 ${direction*-2.4693}"/>
+			<parent link="${prefix}p_link1"/>
+			<child link="${prefix}f_link4_1"/>
+		</joint>
+
+		<link name="${prefix}f_link4_2">
+			<inertial>
+				<origin xyz="0.0104118 ${direction*0.000536687} -1.76714E-07" />
+				<mass value="0.0784310054995906"/>
+				<inertia ixx="3.68968904398209E-06" ixy="${direction*3.62846908118418E-07}" ixz="2.16090077897182E-10"
+				         iyy="1.11655087077288E-05" iyz="${direction*-8.17126072759846E-11}" izz="1.11880378622946E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}ring_joint" type="${joint_type}">
+			<origin xyz="0.007 0 0.0021" rpy="1.5708 0 0"/>
+			<parent link="${prefix}f_link4_1"/>
+			<child link="${prefix}f_link4_2"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.396" effort="10" velocity="1.5"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link4_3">
+			<inertial>
+				<origin xyz="0.0254086 ${direction*0.00100286} -1.00774E-05" />
+				<mass value="0.0416861487052188"/>
+				<inertia ixx="1.69094172497271E-06" ixy="${direction*1.39625694682959E-06}" ixz="-5.80193699374524E-09"
+				         iyy="1.03628795161565E-05" iyz="${direction*1.23045451809429E-09}" izz="1.02475072115751E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"
+					      />
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"
+					      />
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}ring_dip" type="${joint_type}">
+			<origin xyz="0.032003 -0.0025 0" rpy="0 0 0.41015"/>
+			<parent link="${prefix}f_link4_2"/>
+			<child link="${prefix}f_link4_3"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.204" effort="10" velocity="1.5"/>
+				<mimic joint="${prefix}ring_joint" multiplier="0.8625" offset="0"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link5_1">
+			<inertial>
+				<origin xyz="0.0043155 -3.59545E-05 -0.00029352" />
+				<mass value="0.01220067525638"/>
+				<inertia ixx="1.76157556392802E-07" ixy="-1.18013880311001E-11" ixz="5.12581897126774E-08"
+				         iyy="6.86901221323971E-07" iyz="-5.70496564995074E-13" izz="6.04592917607104E-07"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"
+					      />
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link1.glb"
+					      />
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}pinky_base_joint" type="fixed">
+			<origin xyz="-0.00116013 ${direction*0.0352765} 0.106896"
+			        rpy="${direction*-0.672265} -1.5707 ${direction*-2.4693}"/>
+			<parent link="${prefix}p_link1"/>
+			<child link="${prefix}f_link5_1"/>
+		</joint>
+
+		<link name="${prefix}f_link5_2">
+			<inertial>
+				<origin xyz="0.0104118 ${direction*0.000536687} -1.76714E-07" />
+				<mass value="0.0784310054995929"/>
+				<inertia ixx="3.68968904398218E-06" ixy="${direction*3.62846908118589E-07}" ixz="2.16090077603553E-10"
+				         iyy="1.11655087077296E-05" iyz="${direction*-8.17126072548088E-11}" izz="1.11880378622953E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"
+					      />
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link2.glb"
+					      />
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}pinky_joint" type="${joint_type}">
+			<origin xyz="0.007 0 0.0021" rpy="1.5708 0 0"/>
+			<parent link="${prefix}f_link5_1"/>
+			<child link="${prefix}f_link5_2"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.396" effort="10" velocity="1.5"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}f_link5_3">
+			<inertial>
+				<origin xyz="0.0254086 ${direction*0.00100286} -1.00773E-05" />
+				<mass value="0.0416861635327023"/>
+				<inertia ixx="1.69094167190015E-06" ixy="${direction*1.39625736423548E-06}" ixz="-5.80196130076571E-09"
+				         iyy="1.03628901393644E-05" iyz="${direction*1.23048408364082E-09}" izz="1.02475178499253E-05"/>
+			</inertial>
+			<visual>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"/>
+				</geometry>
+			</visual>
+			<collision>
+				<geometry>
+					<mesh filename="file://$(find freedom_description)/meshes/freedomv2/index_link3.glb"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="${prefix}pinky_dip" type="${joint_type}">
+			<origin xyz="0.032003 -0.0025 0" rpy="0 0 0.41015"/>
+			<parent link="${prefix}f_link5_2"/>
+			<child link="${prefix}f_link5_3"/>
+			<xacro:unless value="${fixed_joints}">
+				<axis xyz="0 0 1"/>
+				<limit lower="0" upper="1.204" effort="10" velocity="1.5"/>
+				<mimic joint="${prefix}pinky_joint" multiplier="0.8625" offset="0"/>
+			</xacro:unless>
+		</joint>
+
+		<link name="${prefix}eef"/>
+		<joint name="${prefix}eef_joint" type="fixed">
+			<parent link="${prefix}hand_base"/>
+			<child link="${prefix}eef"/>
+			<origin xyz="0.02 0 0.07"/>
+		</joint>
+	</xacro:macro>
+
+</robot>

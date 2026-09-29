@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="LinkerHand_$(arg type)" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:arg name="type" default="o7"/>
+	<xacro:arg name="direction" default="1"/>
+
+	<!-- 创建手部 (direction=1 为左手, direction=-1 为右手) -->
+	<!-- 支持 type: o7, o6, l6, l10 -->
+	<xacro:if value="${'$(arg type)' == 'o7'}">
+		<xacro:include filename="$(find linkerhand_description)/xacro/o7.xacro"/>
+		<xacro:LinkerHandO7 name="" direction="$(arg direction)"/>
+	</xacro:if>
+
+	<xacro:if value="${'$(arg type)' == 'o6'}">
+		<xacro:include filename="$(find linkerhand_description)/xacro/o6.xacro"/>
+		<xacro:LinkerHandO6 name="" direction="$(arg direction)"/>
+	</xacro:if>
+
+	<xacro:if value="${'$(arg type)' == 'l6'}">
+		<xacro:include filename="$(find linkerhand_description)/xacro/l6.xacro"/>
+		<xacro:LinkerHandL6 name="" direction="$(arg direction)"/>
+	</xacro:if>
+
+	<xacro:if value="${'$(arg type)' == 'l10'}">
+		<xacro:include filename="$(find linkerhand_description)/xacro/l10.xacro"/>
+		<xacro:LinkerHandL10 name="" direction="$(arg direction)" use_flange="true"/>
+	</xacro:if>
+
+
+</robot>
