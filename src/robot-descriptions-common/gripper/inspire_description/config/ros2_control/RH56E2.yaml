@@ -41,8 +41,8 @@ hand_joint_controller:
       - velocity
     home_1: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     home_2: [0.4, 0.4, 0.6, 0.6, 0.6, 0.6]
-    home_interpolation_type: "None"
-    movej_interpolation_type: "None"
+    home_interpolation_type: "linear"
+    movej_interpolation_type: "linear"
     home_duration: 3.0
     movej_duration: 3.0
     hold_position_threshold: 0.1

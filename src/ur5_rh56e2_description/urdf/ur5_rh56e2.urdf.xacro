@@ -47,71 +47,7 @@
 
   </xacro:ur_robot>
 
-  <!-- ===================================== -->
-  <!-- UR5 ros2_control for Gazebo           -->
-  <!-- ===================================== -->
 
-  <ros2_control name="ur5_sim_system" type="system">
-
-    <hardware>
-      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-    </hardware>
-
-    <joint name="ur5_shoulder_pan_joint">
-      <command_interface name="position"/>
-      <state_interface name="position">
-        <param name="initial_value">0.0</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-
-    <joint name="ur5_shoulder_lift_joint">
-      <command_interface name="position"/>
-      <state_interface name="position">
-        <param name="initial_value">-0.51145</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-
-    <joint name="ur5_elbow_joint">
-      <command_interface name="position"/>
-      <state_interface name="position">
-        <param name="initial_value">0.50894</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-
-    <joint name="ur5_wrist_1_joint">
-      <command_interface name="position"/>
-      <state_interface name="position">
-        <param name="initial_value">0.0</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-
-    <joint name="ur5_wrist_2_joint">
-      <command_interface name="position"/>
-      <state_interface name="position">
-        <param name="initial_value">0.0</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-
-    <joint name="ur5_wrist_3_joint">
-      <command_interface name="position"/>
-      <state_interface name="position">
-        <param name="initial_value">1.53058</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-
-  </ros2_control>
 
   <!-- ===================================== -->
   <!-- 완성형 RH56E2                         -->
