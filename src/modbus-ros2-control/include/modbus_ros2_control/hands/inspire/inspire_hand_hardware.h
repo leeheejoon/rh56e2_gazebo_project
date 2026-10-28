@@ -50,12 +50,12 @@ private:
   static constexpr std::size_t kJointCount = 6;
   static constexpr std::size_t kActuatorCount = 6;
 
-  static constexpr uint16_t kModeRegister = 1100;
-  static constexpr uint16_t kAngleSetRegister = 1040;
-  static constexpr uint16_t kForceSetRegister = 1046;
-  static constexpr uint16_t kSpeedSetRegister = 1052;
-  static constexpr uint16_t kAngleActRegister = 1064;
-  static constexpr uint16_t kForceActRegister = 1070;
+  // RH56E2 user manual, section 2.6: ANGLE_SET/ACT are normalized 0..1000.
+  static constexpr uint16_t kAngleSetRegister = 1486;
+  static constexpr uint16_t kForceSetRegister = 1498;
+  static constexpr uint16_t kSpeedSetRegister = 1522;
+  static constexpr uint16_t kAngleActRegister = 1546;
+  static constexpr uint16_t kForceActRegister = 1582;
 
   void load_parameters();
   bool validate_joint_interfaces() const;
@@ -92,8 +92,8 @@ private:
   int background_period_ms_ = 20;
   std::atomic_bool background_period_initialized_{false};
   int command_deadband_raw_ = 1;
-  uint16_t default_speed_ = 4000;
-  uint16_t default_force_ = 6000;
+  uint16_t default_speed_ = 400;
+  uint16_t default_force_ = 600;
 
   std::unique_ptr<ModbusRtuCommunicator> modbus_;
   std::atomic_bool background_running_{false};

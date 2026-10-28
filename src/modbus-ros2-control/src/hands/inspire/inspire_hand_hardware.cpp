@@ -113,8 +113,18 @@ hardware_interface::CallbackReturn InspireHandHardware::on_activate(
 
   std::array<double, kJointCount> initial_positions{};
   std::array<double, kJointCount> initial_efforts{};
-  if (read_feedback_enabled_ && read_feedback(initial_positions, initial_efforts))
+  if (read_feedback_enabled_)
   {
+    if (!read_feedback(initial_positions, initial_efforts))
+    {
+      RCLCPP_ERROR(
+        rclcpp::get_logger(kLoggerName),
+        "Cannot activate Inspire hand without valid ANGLE_ACT feedback at register %u",
+        kAngleActRegister);
+      disconnect_modbus();
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+
     for (std::size_t i = 0; i < kJointCount; ++i)
     {
       hw_positions_[i] = initial_positions[i];
@@ -277,11 +287,11 @@ void InspireHandHardware::load_parameters()
   default_speed_ = static_cast<uint16_t>(std::clamp(
     parse_int(get_parameter("default_speed", std::to_string(default_speed_)), default_speed_),
     0,
-    4000));
+    1000));
   default_force_ = static_cast<uint16_t>(std::clamp(
     parse_int(get_parameter("default_force", std::to_string(default_force_)), default_force_),
     0,
-    12000));
+    3000));
   read_feedback_enabled_ = parse_bool(
     get_parameter("read_feedback", read_feedback_enabled_ ? "true" : "false"),
     read_feedback_enabled_);
@@ -501,24 +511,15 @@ void InspireHandHardware::background_loop()
 
 bool InspireHandHardware::initialize_hand()
 {
-  std::array<uint16_t, kActuatorCount> modes{};
-  modes.fill(0);
-  if (modbus_->writeRegisters(kModeRegister, modes.size(), modes.data()) !=
-      static_cast<int>(modes.size()))
-  {
-    RCLCPP_WARN(
-      rclcpp::get_logger(kLoggerName),
-      "Failed to set Inspire hand mode register; continuing with current device mode");
-  }
-
   std::array<uint16_t, kActuatorCount> speeds{};
   speeds.fill(default_speed_);
   if (modbus_->writeRegisters(kSpeedSetRegister, speeds.size(), speeds.data()) !=
       static_cast<int>(speeds.size()))
   {
-    RCLCPP_WARN(
+    RCLCPP_ERROR(
       rclcpp::get_logger(kLoggerName),
-      "Failed to set Inspire hand speed register; continuing");
+      "Failed to set Inspire hand SPEED_SET register %u", kSpeedSetRegister);
+    return false;
   }
 
   std::array<uint16_t, kActuatorCount> forces{};
@@ -526,9 +527,10 @@ bool InspireHandHardware::initialize_hand()
   if (modbus_->writeRegisters(kForceSetRegister, forces.size(), forces.data()) !=
       static_cast<int>(forces.size()))
   {
-    RCLCPP_WARN(
+    RCLCPP_ERROR(
       rclcpp::get_logger(kLoggerName),
-      "Failed to set Inspire hand force register; continuing");
+      "Failed to set Inspire hand FORCE_SET register %u", kForceSetRegister);
+    return false;
   }
 
   return true;
@@ -543,6 +545,19 @@ bool InspireHandHardware::read_feedback(
     kAngleActRegister, angle_registers.size(), angle_registers.data());
   if (angle_count != static_cast<int>(angle_registers.size()))
   {
+    return false;
+  }
+
+  // Reject invalid values rather than clamping them to a plausible joint angle.
+  if (std::any_of(angle_registers.begin(), angle_registers.end(),
+      [](uint16_t value) { return value > 1000; }))
+  {
+    RCLCPP_ERROR_THROTTLE(
+      rclcpp::get_logger(kLoggerName), *get_node()->get_clock(), 2000,
+      "Invalid Inspire ANGLE_ACT feedback at register %u: [%u, %u, %u, %u, %u, %u] "
+      "(expected 0..1000)",
+      kAngleActRegister, angle_registers[0], angle_registers[1], angle_registers[2],
+      angle_registers[3], angle_registers[4], angle_registers[5]);
     return false;
   }
 
@@ -617,41 +632,30 @@ uint16_t InspireHandHardware::joint_to_actuator_value(
   double radians,
   std::size_t joint_index) const
 {
-  constexpr std::array<double, kJointCount> raw_open{1750.0, 1450.0, 1740.0, 1740.0, 1740.0, 1740.0};
-  constexpr std::array<double, kJointCount> raw_closed{500.0, 1100.0, 900.0, 900.0, 900.0, 900.0};
-
   const auto lower = lower_limits_[joint_index];
   const auto upper = upper_limits_[joint_index];
   if (upper <= lower)
   {
-    return static_cast<uint16_t>(std::lround(raw_open[joint_index]));
+    return 1000;
   }
 
   const auto ratio = std::clamp((radians - lower) / (upper - lower), 0.0, 1.0);
-  const auto value = raw_open[joint_index] + ratio * (raw_closed[joint_index] - raw_open[joint_index]);
-  return static_cast<uint16_t>(std::clamp<long>(std::lround(value), 0, 2000));
+  // Device angle 1000 is extended; ROS bending angle increases towards flexion.
+  return static_cast<uint16_t>(std::lround(1000.0 * (1.0 - ratio)));
 }
 
 double InspireHandHardware::actuator_value_to_joint(
   uint16_t value,
   std::size_t joint_index) const
 {
-  constexpr std::array<double, kJointCount> raw_open{1750.0, 1450.0, 1740.0, 1740.0, 1740.0, 1740.0};
-  constexpr std::array<double, kJointCount> raw_closed{500.0, 1100.0, 900.0, 900.0, 900.0, 900.0};
-
   const auto lower = lower_limits_[joint_index];
   const auto upper = upper_limits_[joint_index];
-  if (upper <= lower || std::abs(raw_closed[joint_index] - raw_open[joint_index]) <
-                          std::numeric_limits<double>::epsilon())
+  if (upper <= lower)
   {
     return lower;
   }
 
-  const auto ratio = std::clamp(
-    (static_cast<double>(value) - raw_open[joint_index]) /
-      (raw_closed[joint_index] - raw_open[joint_index]),
-    0.0,
-    1.0);
+  const auto ratio = 1.0 - std::clamp(static_cast<double>(value) / 1000.0, 0.0, 1.0);
   return lower + ratio * (upper - lower);
 }
 

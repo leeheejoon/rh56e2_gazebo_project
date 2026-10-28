@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="grasp_support">
+    <!-- 중앙의 좁은 지지부와 손 바깥쪽의 넓은 받침판 -->
+    <static>true</static>
+
+    <link name="support_link">
+      <collision name="support_collision">
+        <pose>0 0.020 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.024 0.080 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name="support_visual">
+        <pose>0 0.020 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.024 0.080 0.02</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.4 0.4 0.4 1</ambient>
+          <diffuse>0.4 0.4 0.4 1</diffuse>
+        </material>
+      </visual>
+
+      <collision name="outer_plate_collision">
+        <pose>0 0.090 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.10 0.10 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name="outer_plate_visual">
+        <pose>0 0.090 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.10 0.10 0.02</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.4 0.4 0.4 1</ambient>
+          <diffuse>0.4 0.4 0.4 1</diffuse>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

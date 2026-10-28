@@ -162,6 +162,8 @@ modbus_ros2_control/
 | | `slave_id` | `auto` | |
 | | `baudrate` | `115200` | |
 | | `read_feedback` | `true` | |
+| | `default_speed` | `400` | RH56E2 `SPEED_SET`，范围 `[0, 1000]` |
+| | `default_force` | `600` | RH56E2 `FORCE_SET`，范围 `[0, 3000]`，单位 g |
 | **FreedomRS485Hardware** | `protocol_version` | `auto` | `freedomv1` / `freedomv2` |
 | | `serial_port` | `/dev/ttyUSB0` | |
 | | `hand_side` | — | |
@@ -196,7 +198,7 @@ modbus_ros2_control/
 |------|-------------------|----------|
 | Changingtek 夹爪 | 0.0（闭合）~ 1.0（打开） | 0–9000（0=开，9000=合） |
 | LinkerHand O6/O7 | 0.0 ~ 1.0（弯曲→伸直） | 0–255 |
-| Inspire RH56 | 弧度（rad） | 寄存器原始值约 500–1750 |
+| Inspire RH56 | 弧度（rad） | RH56E2 `ANGLE_SET`（1486）/`ANGLE_ACT`（1546）：归一化值 0–1000；1000 对应最大设备角度 |
 | Freedom / XHand1 | 弧度（rad） | 各协议自定义映射 |
 | TheoHand STD16A | 弧度 / 米（按 URDF 关节限位归一化） | 0–9000（协议位置单位约等于 0.01 deg） |
 

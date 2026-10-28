@@ -157,6 +157,7 @@ def generate_launch_description():
         )
     )
 
+
     
     # 최종적으로 이 launch 파일에서 이것들을 실행하라.
     return LaunchDescription([
@@ -169,4 +170,6 @@ def generate_launch_description():
         hand_joint_controller,
 
         start_fsm_after_controller,
+        spawn_box_after_support,
+        spawn_support,
     ])
